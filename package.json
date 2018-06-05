@@ -34,6 +34,11 @@
     ],
     "require": [
       "@babel/register"
-    ]
+    ],
+    "babel": {
+      "testOptions": {
+        "babelrc": false
+      }
+    }
   }
 }
