@@ -18,3 +18,5 @@ npm-debug.log*
 coverage/
 .prettierrc
 .vscode/
+.babelrc
+.editorconfig
