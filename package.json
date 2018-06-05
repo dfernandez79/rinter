@@ -7,7 +7,6 @@
   "repository": "https://github.com/rinterjs/rinter.git",
   "author": "dfernandez79 <diegof79@gmail.com>",
   "license": "MIT",
-  "private": true,
   "dependencies": {
     "lodash": "^4.17.10",
     "rxjs": "^6.2.0"
