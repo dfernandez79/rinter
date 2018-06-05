@@ -1,0 +1,39 @@
+{
+  "name": "rinter",
+  "version": "1.0.0",
+  "description": "Bring balance to the force, by mixing functional and OOP to create  an Elm Architecture",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "repository": "https://github.com/rinterjs/rinter.git",
+  "author": "dfernandez79 <diegof79@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "rxjs": "^6.2.0"
+  },
+  "devDependencies": {
+    "@babel/register": "^7.0.0-beta.49",
+    "ava": "1.0.0-beta.5.1",
+    "babel-cli": "^7.0.0-beta.3",
+    "babel-core": "^7.0.0-beta.49",
+    "babel-preset-env": "^7.0.0-beta.3",
+    "npm-run-all": "^4.1.3",
+    "nyc": "^12.0.1",
+    "rimraf": "^2.6.2"
+  },
+  "scripts": {
+    "build": "babel src -d lib",
+    "test": "ava",
+    "coverage": "nyc --reporter=html ava",
+    "clean": "rimraf lib *.tgz coverage .nyc_output"
+  },
+  "ava": {
+    "files": [
+      "src/**/*.test.js"
+    ],
+    "require": [
+      "@babel/register"
+    ]
+  }
+}

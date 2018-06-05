@@ -1,0 +1,6 @@
+node_modules/
+lib/
+esm/
+.nyc_output/
+coverage/
+*.tgz
