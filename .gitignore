@@ -4,3 +4,4 @@ esm/
 .nyc_output/
 coverage/
 *.tgz
+out/
