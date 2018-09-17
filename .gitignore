@@ -4,4 +4,7 @@ esm/
 .nyc_output/
 coverage/
 *.tgz
-out/
+jsdoc/
+examples/**/.cache
+examples/**/dist
+*.log

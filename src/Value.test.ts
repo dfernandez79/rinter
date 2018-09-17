@@ -9,27 +9,27 @@ test('initial value', t => {
 });
 
 test('set value', t => {
-  const value = Value.initial(10);
+  const value = Value.initial<number>(10);
   value.set(5);
   t.is(value.get(), 5);
 });
 
 test('notify current value on subscription', t => {
   t.plan(1);
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   value.set(2);
   value.changes().subscribe(v => t.is(v, 2));
 });
 
 test('notify initial value on subscription', t => {
   t.plan(1);
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   value.changes().subscribe(v => t.is(v, 0));
 });
 
 test('notify value changes', t => {
   t.plan(2);
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   value
     .changes()
     .pipe(bufferCount(2))
@@ -42,7 +42,7 @@ test('notify value changes', t => {
 
 test('ignore equal values', t => {
   t.plan(2);
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   value
     .changes()
     .pipe(bufferCount(2))
@@ -59,7 +59,7 @@ test('ignore equal values', t => {
 
 test('update value with another observable', t => {
   const source = new BehaviorSubject(10);
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   t.plan(3);
   value
     .changes()
@@ -74,19 +74,23 @@ test('update value with another observable', t => {
 });
 
 test('update with partial object', t => {
-  const value = Value.initial({ a: 1 });
+  type TestObject = {
+    a: number;
+    b?: number;
+  };
+  const value = Value.initial<TestObject>({ a: 1 });
   value.update({ b: 2 });
   t.deepEqual(value.get(), { a: 1, b: 2 });
 });
 
 test('update with primitive', t => {
-  const value = Value.initial(0);
+  const value = Value.initial<number>(0);
   value.update(1);
   t.is(value.get(), 1);
 });
 
 test('update with array', t => {
-  const state = Value.initial([]);
+  const state = Value.initial<number[]>([]);
   const newValue = [1];
   state.update(newValue);
   t.is(state.get(), newValue);

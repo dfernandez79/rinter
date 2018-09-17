@@ -3,7 +3,7 @@ import { bufferCount } from 'rxjs/operators';
 
 import Controller, { Value } from '.';
 
-class Counter extends Controller {
+class Counter extends Controller<number> {
   constructor() {
     super(Value.initial(0));
   }
