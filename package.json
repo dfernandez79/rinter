@@ -26,7 +26,7 @@
     "test:run": "ava",
     "coverage": "npm-run-all build coverage:run",
     "coverage:run": "nyc --reporter=html ava",
-    "clean": "rimraf lib *.tgz coverage .nyc_output *.log jsdoc",
+    "clean": "rimraf lib *.tgz coverage .nyc_output *.log",
     "lint": "tslint -p tsconfig.json"
   },
   "ava": {
