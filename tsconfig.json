@@ -5,7 +5,8 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "noImplicitAny": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "declaration": true
   },
   "include": ["src/**/*.ts"]
 }
