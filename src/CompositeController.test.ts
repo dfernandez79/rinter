@@ -1,31 +1,31 @@
 import test from 'ava';
 import { bufferCount } from 'rxjs/operators';
 
-import Controller, { CompositeController } from '.';
-import { create } from './CompositeController';
-import Value from './Value';
+import Controller, { create, CompositeController, ValueHolder } from '.';
 
 class NumberController extends Controller<number> {
-  update(value: number) {
+  public update(value: number) {
     this._updateState(value);
   }
 }
 
 type TwoNumbers = { a: number; b: number };
+
+// tslint:disable:max-classes-per-file
 class TwoNumbersController extends CompositeController<TwoNumbers> {
-  constructor(state: Value<TwoNumbers>) {
+  constructor(state: ValueHolder<TwoNumbers>) {
     super({ a: create(NumberController), b: create(NumberController) }, state);
   }
 
-  updateA(n: number) {
+  public updateA(n: number) {
     (this._children.a as NumberController).update(n);
   }
 
-  updateB(n: number) {
+  public updateB(n: number) {
     (this._children.b as NumberController).update(n);
   }
 
-  multipleUpdates() {
+  public multipleUpdates() {
     this._notifyLastChangeOnly(() => {
       this.updateA(this._children.a.getState() + 1);
       this.updateA(this._children.a.getState() + 1);
@@ -48,22 +48,22 @@ type Shape = {
   size: { width: number; height: number };
 };
 class ShapePositionController extends CompositeController<ShapePosition> {
-  constructor(state: Value<ShapePosition>) {
+  constructor(state: ValueHolder<ShapePosition>) {
     super({ x: create(NumberController), y: create(NumberController) }, state);
   }
 
-  updateX(x: number) {
+  public updateX(x: number) {
     (this._children.x as NumberController).update(x);
   }
 }
 
 class ShapeSizeController extends CompositeController<ShapeSize> {
-  constructor(state: Value<ShapeSize>) {
+  constructor(state: ValueHolder<ShapeSize>) {
     super({ x: create(NumberController), y: create(NumberController) }, state);
   }
 }
 class ShapeController extends CompositeController<Shape> {
-  constructor(state: Value<Shape>) {
+  constructor(state: ValueHolder<Shape>) {
     super(
       {
         position: create(ShapePositionController),
@@ -73,14 +73,14 @@ class ShapeController extends CompositeController<Shape> {
     );
   }
 
-  updateX(x: number) {
+  public updateX(x: number) {
     (this._children.position as ShapePositionController).updateX(x);
   }
 }
 
 test('create from factories and initial value', t => {
   const initialValue = { a: 1, b: 1 };
-  const composite = new TwoNumbersController(Value.initial(initialValue));
+  const composite = new TwoNumbersController(new ValueHolder(initialValue));
 
   t.is(composite.getState(), initialValue);
 });
@@ -88,7 +88,7 @@ test('create from factories and initial value', t => {
 test('report changes from children', t => {
   t.plan(4);
 
-  const composite = new TwoNumbersController(Value.initial({ a: 1, b: 1 }));
+  const composite = new TwoNumbersController(new ValueHolder({ a: 1, b: 1 }));
 
   composite
     .changes()
@@ -105,7 +105,7 @@ test('report changes from children', t => {
 
 test('notify last change only', t => {
   t.plan(4);
-  const composite = new TwoNumbersController(Value.initial({ a: 1, b: 1 }));
+  const composite = new TwoNumbersController(new ValueHolder({ a: 1, b: 1 }));
 
   composite
     .changes()
@@ -122,7 +122,7 @@ test('notify last change only', t => {
 
 test('compose deep', t => {
   const composite = new ShapeController(
-    Value.initial({
+    new ValueHolder({
       position: { x: 0, y: 0 },
       size: { width: 10, height: 10 },
     })
@@ -140,7 +140,7 @@ test('compose deep', t => {
 test('notify initial state', t => {
   t.plan(1);
   const initial = { a: 1, b: 2 };
-  const composite = new TwoNumbersController(Value.initial(initial));
+  const composite = new TwoNumbersController(new ValueHolder(initial));
 
   composite.changes().subscribe(v => t.is(initial, v));
 });

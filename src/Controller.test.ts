@@ -1,19 +1,15 @@
 import test from 'ava';
 import { bufferCount } from 'rxjs/operators';
 
-import Controller, { Value } from '.';
+import Controller, { ValueHolder } from '.';
 
 class Counter extends Controller<number> {
   constructor() {
-    super(Value.initial(0));
+    super(new ValueHolder<number>(0));
   }
 
-  increment() {
+  public increment() {
     this._updateState(this.getState() + 1);
-  }
-
-  decrement() {
-    this._updateState(this.getState() - 1);
   }
 }
 
