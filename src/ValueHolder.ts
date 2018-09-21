@@ -1,4 +1,4 @@
-import isPlainObject from 'lodash/isPlainObject';
+import { isPlainObject } from 'lodash';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 

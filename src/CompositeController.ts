@@ -1,9 +1,7 @@
 import { empty, merge, BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
-import mapValues from 'lodash/mapValues';
-import transform from 'lodash/transform';
-
+import { mapValues, transform } from 'lodash';
 import StateProvider from './StateProvider';
 import ValueHolder, { PlainObject, Value } from './ValueHolder';
 

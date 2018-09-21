@@ -13,30 +13,34 @@ type TwoNumbers = { a: number; b: number };
 
 // tslint:disable:max-classes-per-file
 class TwoNumbersController extends CompositeController<TwoNumbers> {
+  private _a: NumberController;
+  private _b: NumberController;
   constructor(state: ValueHolder<TwoNumbers>) {
     super({ a: create(NumberController), b: create(NumberController) }, state);
+    this._a = this._children.a as NumberController;
+    this._b = this._children.b as NumberController;
   }
 
   public updateA(n: number) {
-    (this._children.a as NumberController).update(n);
+    this._a.update(n);
   }
 
   public updateB(n: number) {
-    (this._children.b as NumberController).update(n);
+    this._b.update(n);
   }
 
   public multipleUpdates() {
     this._notifyLastChangeOnly(() => {
-      this.updateA(this._children.a.getState() + 1);
-      this.updateA(this._children.a.getState() + 1);
-      this.updateA(this._children.a.getState() + 1);
-      this.updateA(this._children.a.getState() + 1);
+      this.updateA(this._a.getState() + 1);
+      this.updateA(this._a.getState() + 1);
+      this.updateA(this._a.getState() + 1);
+      this.updateA(this._a.getState() + 1);
 
-      this.updateB(this._children.b.getState() + 1);
-      this.updateB(this._children.b.getState() + 1);
-      this.updateB(this._children.b.getState() + 1);
-      this.updateB(this._children.b.getState() + 1);
-      this.updateB(this._children.b.getState() + 1);
+      this.updateB(this._b.getState() + 1);
+      this.updateB(this._b.getState() + 1);
+      this.updateB(this._b.getState() + 1);
+      this.updateB(this._b.getState() + 1);
+      this.updateB(this._b.getState() + 1);
     });
   }
 }

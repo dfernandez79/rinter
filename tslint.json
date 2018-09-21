@@ -25,7 +25,8 @@
         },
         "esSpecCompliant": true
       }
-    ]
+    ],
+    "semicolon": [true, "always", "strict-bound-class-methods"]
   },
   "rulesDirectory": []
 }
