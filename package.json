@@ -3,10 +3,11 @@
   "version": "1.0.1",
   "description": "Minimalist state container based on reactive extensions",
   "main": "lib/index.js",
-  "module": "src/index.js",
+  "module": "lib-esm/index.js",
   "repository": "https://github.com/rinterjs/rinter.git",
   "author": "Diego Fernandez <diegof79@gmail.com>",
   "license": "MIT",
+  "sideEffects": false,
   "dependencies": {
     "lodash": "^4.17.11",
     "rxjs": "^6.3.2"
@@ -21,12 +22,14 @@
     "typescript": "^3.0.3"
   },
   "scripts": {
-    "build": "tsc",
-    "test": "npm-run-all build test:run",
+    "build": "npm-run-all build:node build:esm",
+    "build:node": "tsc",
+    "build:esm": "tsc -p tsconfig-esm.json",
+    "test": "npm-run-all build:node test:run",
     "test:run": "ava",
-    "coverage": "npm-run-all build coverage:run",
+    "coverage": "npm-run-all build:node coverage:run",
     "coverage:run": "nyc --reporter=html ava",
-    "clean": "rimraf lib *.tgz coverage .nyc_output *.log",
+    "clean": "rimraf lib lib-esm *.tgz coverage .nyc_output *.log",
     "lint": "tslint -p tsconfig.json"
   },
   "ava": {
