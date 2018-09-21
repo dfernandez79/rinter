@@ -1,15 +1,13 @@
-import { BehaviorSubject, merge, empty, Observable } from 'rxjs';
-import { map, filter, switchMap } from 'rxjs/operators';
+import { empty, merge, BehaviorSubject, Observable } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 import mapValues from 'lodash/mapValues';
 import transform from 'lodash/transform';
 
-import Value, { PlainValue, PlainObject } from './Value';
-import { StateProvider } from './Controller';
+import StateProvider from './StateProvider';
+import ValueHolder, { PlainObject, Value } from './ValueHolder';
 
-type ControllerFactory<T extends PlainValue> = (
-  initialValue: T
-) => StateProvider<T>;
+type ControllerFactory<T extends Value> = (initialValue: T) => StateProvider<T>;
 
 type ControllerFactoryMap = {
   [key: string]: ControllerFactory<any>;
@@ -24,22 +22,22 @@ const createChildren = <T extends PlainObject>(
   initialValue: T
 ) => mapValues(factories, (factory, key) => factory(initialValue[key]));
 
-type StateProviderConstructor<T extends PlainValue> = {
-  new (state: Value<T>): StateProvider<T>;
+type StateProviderConstructor<T extends Value> = {
+  new (state: ValueHolder<T>): StateProvider<T>;
 };
 
-export const create = <T extends PlainValue>(
+export const create = <T extends Value>(
   ctor: StateProviderConstructor<T>
 ): ControllerFactory<T> => (initialValue: T) =>
-  new ctor(Value.initial(initialValue));
+  new ctor(new ValueHolder(initialValue));
 
 export default class CompositeController<T extends PlainObject>
   implements StateProvider<T> {
-  private _state: Value<T>;
-  private _silent: BehaviorSubject<boolean>;
   protected _children: CompositeControllerChildren;
+  private _state: ValueHolder<T>;
+  private _silent: BehaviorSubject<boolean>;
 
-  constructor(factories: ControllerFactoryMap, state: Value<T>) {
+  constructor(factories: ControllerFactoryMap, state: ValueHolder<T>) {
     this._state = state;
     this._children = createChildren(factories, state.get());
     this._silent = new BehaviorSubject(false);
@@ -63,17 +61,11 @@ export default class CompositeController<T extends PlainObject>
     );
   }
 
-  /**
-   * @see StateProvider#getState
-   */
-  getState() {
+  public getState() {
     return this._state.get();
   }
 
-  /**
-   * @see StateProvider#changes
-   */
-  changes() {
+  public changes() {
     return this._state.changes();
   }
 
