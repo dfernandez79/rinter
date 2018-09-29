@@ -1,6 +1,6 @@
 {
   "name": "rinter",
-  "version": "2.0.0-0",
+  "version": "2.0.0-1",
   "description": "Minimalist state container based on reactive extensions",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
@@ -15,9 +15,9 @@
   "devDependencies": {
     "@types/lodash": "^4.14.116",
     "ava": "0.25.0",
+    "lodash": "^4.17.11",
     "npm-run-all": "^4.1.3",
     "nyc": "^13.0.1",
-    "lodash": "^4.17.11",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
     "tslint": "^5.11.0",
