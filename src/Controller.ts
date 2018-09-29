@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import StateProvider from './StateProvider';
 import ValueHolder, { Value } from './ValueHolder';
 
-export default class Controller<T extends Value> implements StateProvider<T> {
+export default abstract class Controller<T extends Value> implements StateProvider<T> {
   private _state: ValueHolder<T>;
 
   constructor(state: ValueHolder<T>) {

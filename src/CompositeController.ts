@@ -29,7 +29,7 @@ export const create = <T extends Value>(
 ): ControllerFactory<T> => (initialValue: T) =>
   new ctor(new ValueHolder(initialValue));
 
-export default class CompositeController<T extends PlainObject>
+export default abstract class CompositeController<T extends PlainObject>
   implements StateProvider<T> {
   protected _children: CompositeControllerChildren;
   private _state: ValueHolder<T>;
