@@ -12,9 +12,6 @@ npm-debug.log*
 # Mac
 .DS_Store
 
-# Examples
-examples/
-
 # Other
 *.tgz
 .nyc_output/
