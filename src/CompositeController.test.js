@@ -65,7 +65,7 @@ test('child accessors are enumerable', t => {
   );
 
   const keys = Object.keys(composite);
-  console.log(keys);
+
   t.is(keys.length, 2);
   t.is(keys[0], 'a');
   t.is(keys[1], 'b');
@@ -93,4 +93,78 @@ test('report changes from children', t => {
   });
 
   composite.a.increment();
+});
+
+test('notify initial state', t => {
+  t.plan(1);
+
+  const initial = { a: 1, b: 2 };
+  const composite = new CompositeController(
+    {
+      a: create(Counter),
+      b: create(Counter),
+    },
+    initial
+  );
+
+  composite.changes.subscribe(v => t.is(initial, v));
+});
+
+test('notify last change only', t => {
+  t.plan(4);
+
+  const composite = new CompositeController(
+    {
+      a: create(Counter),
+      b: create(Counter),
+    },
+    {
+      a: { count: 1 },
+      b: { count: 1 },
+    }
+  );
+
+  composite.changes.pipe(bufferCount(2)).subscribe(buff => {
+    t.is(buff[0].a.count, 1);
+    t.is(buff[0].b.count, 1);
+    t.is(buff[1].a.count, 5);
+    t.is(buff[1].b.count, 6);
+  });
+
+  composite.notifyLastChangeOnly(() => {
+    composite.a.increment();
+    composite.a.increment();
+    composite.a.increment();
+    composite.a.increment();
+
+    composite.b.increment();
+    composite.b.increment();
+    composite.b.increment();
+    composite.b.increment();
+    composite.b.increment();
+  });
+});
+
+test('compose deep', t => {
+  const composite = new CompositeController(
+    {
+      position: { x: create(Counter), y: create(Counter) },
+      size: { width: create(Counter), height: create(Counter) },
+    },
+    {
+      position: { x: { count: 0 }, y: { count: 0 } },
+      size: { width: { count: 10 }, height: { count: 10 } },
+    }
+  );
+
+  t.true(composite.position instanceof CompositeController);
+  t.true(composite.size instanceof CompositeController);
+
+  t.is(composite.state.position.x.count, 0);
+  t.is(composite.state.position.y.count, 0);
+  t.is(composite.state.size.width.count, 10);
+  t.is(composite.state.size.height.count, 10);
+
+  composite.position.x.increment();
+  t.is(composite.state.position.x.count, 1);
 });

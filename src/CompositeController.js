@@ -1,10 +1,15 @@
-import { empty, merge, BehaviorSubject, Observable } from 'rxjs';
+import { empty, merge, BehaviorSubject } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
-import { mapValues, transform } from 'lodash';
+import { mapValues, transform, isFunction } from 'lodash';
 import AbstractController from './AbstractController';
 
-const createChildren = (factories, initialValue) => mapValues(factories, (factory, key) => factory(initialValue[key]));
+const createChildren = (factories, initialValue) =>
+  mapValues(
+    factories,
+    (factory, key) =>
+      isFunction(factory) ? factory(initialValue[key]) : new CompositeController(factory, initialValue[key])
+  );
 
 export const create = ctor => initialValue => new ctor(initialValue);
 
