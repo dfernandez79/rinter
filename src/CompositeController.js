@@ -29,10 +29,8 @@ export default class CompositeController extends AbstractController {
       )
     ).pipe(map(() => mapValues(children, c => c.state)));
 
-    Object.defineProperties(this, {
-      _silent: { value: new BehaviorSubject(false) },
-      ...mapValues(children, value => ({ value, enumerable: true })),
-    });
+    Object.defineProperties(this, { _silent: { value: new BehaviorSubject(false) } });
+    Object.defineProperties(this, mapValues(children, value => ({ value, enumerable: true })));
 
     this._silent.pipe(switchMap(v => (v ? empty() : childChanges))).subscribe(this._subject);
   }
