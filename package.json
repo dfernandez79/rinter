@@ -1,6 +1,6 @@
 {
   "name": "rinter",
-  "version": "2.0.0-2",
+  "version": "2.0.0-3",
   "description": "Minimalist state container based on reactive extensions",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
