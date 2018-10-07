@@ -44,8 +44,8 @@
     "coverage:run": "nyc --reporter=html ava",
     "clean": "rimraf lib lib-esm *.tgz coverage .nyc_output *.log",
     "lint": "eslint src",
-    "publish": "npm-run-all clean lint build publish:np",
-    "publish:np": "np"
+    "release": "npm-run-all clean lint build release:np",
+    "release:np": "np"
   },
   "ava": {
     "files": [
