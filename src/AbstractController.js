@@ -1,6 +1,12 @@
 import { empty, BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { merge } from 'lodash';
+import { mergeWith } from 'lodash';
+
+const customMerge = (objValue, srcValue, key, object) => {
+  if (objValue !== undefined && srcValue === undefined) {
+    delete object[key];
+  }
+};
 
 export default class AbstractController {
   constructor(initialState) {
@@ -28,7 +34,7 @@ export default class AbstractController {
   }
 
   _merge(value) {
-    this._set(merge({}, this.state, value));
+    this._set(mergeWith({}, this.state, value, customMerge));
   }
 
   notifyLastChangeOnly(fn) {

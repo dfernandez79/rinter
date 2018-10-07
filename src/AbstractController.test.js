@@ -121,3 +121,19 @@ test('_merge', t => {
     },
   });
 });
+
+test('_merge is able to remove values', t => {
+  const controller = new StateUpdateTester();
+
+  t.deepEqual(controller.state, {
+    contents: {
+      value: 1,
+    },
+  });
+
+  controller.merge({ contents: { value: undefined } });
+
+  t.deepEqual(controller.state, {
+    contents: { value: undefined },
+  });
+});
