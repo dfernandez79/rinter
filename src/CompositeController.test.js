@@ -9,7 +9,7 @@ class Counter extends AbstractController {
   }
 
   increment() {
-    this._setState({ count: this.state.count + 1 });
+    this._assign({ count: this.state.count + 1 });
   }
 }
 
