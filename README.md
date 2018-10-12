@@ -128,12 +128,14 @@ Since the properties `state` and `changes` are part of the controller contract,
 you cannot use those names to identify controllers:
 
 ```js
-new CompositeController({ state: value => MyController(value) }, { state: {} }); // ERROR! clashes with composite.state
+// ERROR! clashes with composite.state
+new CompositeController({ state: value => MyController(value) }, { state: {} });
 
+// OK - {state:10} is the initial value for Other
 new CompositeController(
   { other: value => Other(value) },
   { other: { state: 10 } }
-); // OK - {state:10} is the initial value for Other
+);
 ```
 
 Is expected that controller constructors receive the initial state value as the
