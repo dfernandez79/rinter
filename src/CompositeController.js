@@ -40,13 +40,4 @@ export default class CompositeController extends AbstractController {
       mapValues(children, value => ({ value, enumerable: true }))
     );
   }
-
-  notifyLastChangeOnly(fn) {
-    this._silent.next(true);
-    try {
-      fn();
-    } finally {
-      this._silent.next(false);
-    }
-  }
 }
