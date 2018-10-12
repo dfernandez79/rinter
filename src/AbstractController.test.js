@@ -28,10 +28,6 @@ class StateUpdateTester extends AbstractController {
     this._assign(value);
   }
 
-  merge(value) {
-    this._merge(value);
-  }
-
   set(value) {
     this._set(value);
   }
@@ -100,40 +96,5 @@ test('_set changes the value', t => {
 
   t.deepEqual(controller.state, {
     flag: true,
-  });
-});
-
-test('_merge', t => {
-  const controller = new StateUpdateTester();
-
-  t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-    },
-  });
-
-  controller.merge({ contents: { flag: true } });
-
-  t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-      flag: true,
-    },
-  });
-});
-
-test('_merge is able to remove values', t => {
-  const controller = new StateUpdateTester();
-
-  t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-    },
-  });
-
-  controller.merge({ contents: { value: undefined } });
-
-  t.deepEqual(controller.state, {
-    contents: { value: undefined },
   });
 });
