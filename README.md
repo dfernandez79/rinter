@@ -50,6 +50,9 @@ Your views should use the methods exposed by the controller to modify the state.
 A convenient way to create a controller is to sub-class `AbstractController`. To
 update the state use the protected\* `_set` or `_assign` methods:
 
+> \* JavaScript doesn't have protected methods, so it up to you to maintain the
+> contract.
+
 ```js
 import AbstractController from 'rinter';
 
@@ -62,9 +65,6 @@ class Counter extends AbstractController {
   }
 }
 ```
-
-> \* JavaScript doesn't have protected fields, so it up to you to maintain the
-> contract.
 
 `AbstractController` also has a convenient method to emit only one state change
 from multiple actions:
@@ -88,8 +88,8 @@ counter.notifyLastChangeOnly(() => {
 To compose various controllers into one object, you can use a
 `CompositeController`.
 
-It receives an object with controller factories, and provides the `state` and
-`changes` properties with the composition:
+A `CompositeController` receives an object with controller factories, 
+and provides the `state` and `changes` properties with the composition:
 
 ```js
 import { CompositeController } from 'rinter';
@@ -125,7 +125,7 @@ controller.second.increase();
 ```
 
 Since the properties `state` and `changes` are part of the controller contract,
-you cannot use those name to identify controllers:
+you cannot use those names to identify controllers:
 
 ```js
 new CompositeController({ state: value => MyController(value) }, { state: {} }); // ERROR! clashes with composite.state
@@ -166,9 +166,8 @@ controller.changes.subscribe(v => console.log(v));
 
 ## Big bundle size
 
-Rinter itself is small, but both RxJS and Lodash are big modules. The library
-packages include ES6 JavaScript files that bundlers like [Webpack] should use
-automatically. If your bundle size is big, make sure to use a bundler that
+Rinter itself is small, but both RxJS and Lodash are big modules. 
+If your bundle size is big, make sure to use a bundler that
 supports ES6 modules and does [tree-shaking] to remove unnecessary code. For
 example, Webpack 4+ or Rollup supports that, but Webpack 3 doesn't.
 
