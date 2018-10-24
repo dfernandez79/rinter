@@ -1,5 +1,4 @@
 import test from 'ava';
-import { bufferCount } from 'rxjs/operators';
 
 import { create, AbstractController, CompositeController } from '.';
 
@@ -72,7 +71,7 @@ test('child accessors are enumerable', t => {
 });
 
 test('report changes from children', t => {
-  t.plan(4);
+  t.plan(2);
 
   const composite = new CompositeController(
     {
@@ -85,18 +84,16 @@ test('report changes from children', t => {
     }
   );
 
-  composite.changes.pipe(bufferCount(2)).subscribe(buff => {
-    t.is(buff[0].a.count, 1);
-    t.is(buff[0].b.count, 1);
-    t.is(buff[1].a.count, 2);
-    t.is(buff[1].b.count, 1);
+  composite.changes.subscribe(state => {
+    t.is(state.a.count, 2);
+    t.is(state.b.count, 1);
   });
 
   composite.a.increment();
 });
 
-test('notify initial state', t => {
-  t.plan(1);
+test('do not notify initial state', t => {
+  t.plan(0);
 
   const initial = { a: 1, b: 2 };
   const composite = new CompositeController(
@@ -107,11 +104,11 @@ test('notify initial state', t => {
     initial
   );
 
-  composite.changes.subscribe(v => t.is(initial, v));
+  composite.changes.subscribe(() => t.fail());
 });
 
 test('notify last change only', t => {
-  t.plan(4);
+  t.plan(2);
 
   const composite = new CompositeController(
     {
@@ -124,11 +121,9 @@ test('notify last change only', t => {
     }
   );
 
-  composite.changes.pipe(bufferCount(2)).subscribe(buff => {
-    t.is(buff[0].a.count, 1);
-    t.is(buff[0].b.count, 1);
-    t.is(buff[1].a.count, 5);
-    t.is(buff[1].b.count, 6);
+  composite.changes.subscribe(state => {
+    t.is(state.a.count, 5);
+    t.is(state.b.count, 6);
   });
 
   composite.notifyLastChangeOnly(() => {

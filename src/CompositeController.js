@@ -33,7 +33,7 @@ export default class CompositeController extends AbstractController {
       )
     )
       .pipe(map(() => mapValues(children, c => c.state)))
-      .subscribe(this._subject);
+      .subscribe(this._set);
 
     Object.defineProperties(
       this,
