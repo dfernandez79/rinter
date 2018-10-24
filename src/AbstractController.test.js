@@ -1,5 +1,4 @@
 import test from 'ava';
-import { bufferCount } from 'rxjs/operators';
 
 import AbstractController from '.';
 
@@ -38,23 +37,21 @@ test('expose current state', t => {
 });
 
 test('expose state changes', t => {
-  t.plan(2);
+  t.plan(1);
   const counter = new Counter();
-  counter.changes.pipe(bufferCount(2)).subscribe(buff => {
-    t.is(buff[0].count, 0);
-    t.is(buff[1].count, 1);
+  counter.changes.subscribe(v => {
+    t.is(v.count, 1);
   });
   counter.increment();
 });
 
 test('notify last change only', t => {
-  t.plan(2);
+  t.plan(1);
 
   const counter = new Counter();
 
-  counter.changes.pipe(bufferCount(2)).subscribe(buff => {
-    t.is(buff[0].count, 0);
-    t.is(buff[1].count, 5);
+  counter.changes.subscribe(v => {
+    t.is(v.count, 5);
   });
 
   counter.notifyLastChangeOnly(() => {
@@ -97,4 +94,23 @@ test('_set changes the value', t => {
   t.deepEqual(controller.state, {
     flag: true,
   });
+});
+
+test('supports multiple subscriptions', t => {
+  t.plan(3);
+  const counter = new Counter();
+
+  counter.changes.subscribe(v => {
+    t.is(v.count, 1);
+  });
+
+  counter.changes.subscribe(v => {
+    t.is(v.count, 1);
+  });
+
+  counter.changes.subscribe(v => {
+    t.is(v.count, 1);
+  });
+
+  counter.increment();
 });

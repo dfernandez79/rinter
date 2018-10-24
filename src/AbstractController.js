@@ -1,37 +1,55 @@
-import { empty, BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
 
 export default class AbstractController {
   constructor(initialState) {
-    const subject = new BehaviorSubject(initialState);
-    const changes = subject.pipe(distinctUntilChanged());
-    const silent = new BehaviorSubject(false);
+    let state = initialState;
+    let silent = false;
+    let observer = undefined;
+
+    const changes = Observable.create(obs => {
+      if (observer !== undefined)
+        throw new Error('Multiple subscriptions are not supported');
+
+      observer = obs;
+
+      return () => {
+        observer = undefined;
+      };
+    });
 
     Object.defineProperties(this, {
-      _subject: { value: subject },
-      _silent: { value: silent },
-      changes: { value: silent.pipe(switchMap(v => (v ? empty() : changes))) },
+      _set: {
+        value: value => {
+          state = value;
+          if (!silent && observer !== undefined) {
+            observer.next(value);
+          }
+        },
+      },
+      changes: {
+        value: changes.pipe(share()),
+      },
+      state: {
+        get: () => state,
+      },
+      notifyLastChangeOnly: {
+        value: fn => {
+          silent = true;
+          try {
+            fn();
+          } finally {
+            silent = false;
+            if (observer !== undefined) {
+              observer.next(state);
+            }
+          }
+        },
+      },
     });
-  }
-
-  get state() {
-    return this._subject.value;
-  }
-
-  _set(value) {
-    this._subject.next(value);
   }
 
   _assign(value) {
     this._set(Object.assign({}, this.state, value));
-  }
-
-  notifyLastChangeOnly(fn) {
-    this._silent.next(true);
-    try {
-      fn();
-    } finally {
-      this._silent.next(false);
-    }
   }
 }
