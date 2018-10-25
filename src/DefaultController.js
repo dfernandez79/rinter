@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-export default class AbstractController {
+export default class DefaultController {
   constructor(initialState) {
     let state = initialState;
     let silent = false;

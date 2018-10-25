@@ -1,13 +1,19 @@
 import { merge } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
-import AbstractController from './AbstractController';
+import DefaultController from './DefaultController';
 
 const createChildren = (factories, initialValue) => {
   const childKeys = Object.keys(factories);
 
   const children = childKeys.reduce((props, key) => {
     const factory = factories[key];
+
+    if (key === 'state' || key === 'changes') {
+      throw new Error(
+        `Cannot create the child controller "${key}". The name clashes with the ${key} property, use another name for the controller.`
+      );
+    }
 
     props[key] =
       typeof factory === 'function'
@@ -22,7 +28,7 @@ const createChildren = (factories, initialValue) => {
 
 export const create = ctor => initialValue => new ctor(initialValue);
 
-export default class CompositeController extends AbstractController {
+export default class CompositeController extends DefaultController {
   constructor(factories, initialState) {
     super(initialState);
 
