@@ -1,17 +1,24 @@
 import { merge } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
-import { mapValues, transform, isFunction } from 'lodash';
 import AbstractController from './AbstractController';
 
-const createChildren = (factories, initialValue) =>
-  mapValues(
-    factories,
-    (factory, key) =>
-      isFunction(factory)
+const createChildren = (factories, initialValue) => {
+  const childKeys = Object.keys(factories);
+
+  const children = childKeys.reduce((props, key) => {
+    const factory = factories[key];
+
+    props[key] =
+      typeof factory === 'function'
         ? factory(initialValue[key])
-        : new CompositeController(factory, initialValue[key])
-  );
+        : new CompositeController(factory, initialValue[key]);
+
+    return props;
+  }, {});
+
+  return { childKeys, children };
+};
 
 export const create = ctor => initialValue => new ctor(initialValue);
 
@@ -19,25 +26,23 @@ export default class CompositeController extends AbstractController {
   constructor(factories, initialState) {
     super(initialState);
 
-    const children = createChildren(factories, initialState);
+    const { childKeys, children } = createChildren(factories, initialState);
 
-    merge(
-      ...transform(
-        children,
-        (observables, child, key) => {
-          observables.push(
-            child.changes.pipe(filter(v => this.state[key] !== v))
-          );
-        },
-        []
+    const childObservers = childKeys.map(key =>
+      children[key].changes.pipe(
+        filter(v => this.state[key] !== v),
+        map(v => ({ [key]: v }))
       )
-    )
-      .pipe(map(() => mapValues(children, c => c.state)))
-      .subscribe(this._set);
+    );
+
+    merge(...childObservers).subscribe(keyValue => this.assign(keyValue));
 
     Object.defineProperties(
       this,
-      mapValues(children, value => ({ value, enumerable: true }))
+      childKeys.reduce((props, key) => {
+        props[key] = { value: children[key], enumerable: true };
+        return props;
+      }, {})
     );
   }
 }

@@ -17,7 +17,6 @@
     "elm"
   ],
   "peerDependencies": {
-    "lodash": ">=2.4.0",
     "rxjs": "6.x"
   },
   "devDependencies": {
@@ -28,7 +27,6 @@
     "ava": "^1.0.0-beta.8",
     "cpy-cli": "^2.0.0",
     "eslint": "^5.6.1",
-    "lodash": "^4.17.11",
     "np": "^3.0.4",
     "npm-run-all": "^4.1.3",
     "nyc": "^13.0.1",
