@@ -1,8 +1,8 @@
 import test from 'ava';
 
-import AbstractController from '.';
+import DefaultController from '.';
 
-class Counter extends AbstractController {
+class Counter extends DefaultController {
   constructor(initialValue = { count: 0 }) {
     super(initialValue);
   }
@@ -13,16 +13,17 @@ class Counter extends AbstractController {
 }
 
 test('expose current state', t => {
-  t.is(new Counter().state.count, 0);
+  const controller = new DefaultController({ count: 0 });
+  t.is(controller.state.count, 0);
 });
 
 test('expose state changes', t => {
   t.plan(1);
-  const counter = new Counter();
+  const counter = new DefaultController({ count: 0 });
   counter.changes.subscribe(v => {
     t.is(v.count, 1);
   });
-  counter.increment();
+  counter.set({ count: 1 });
 });
 
 test('notify last change only', t => {
@@ -44,7 +45,7 @@ test('notify last change only', t => {
 });
 
 test('assign uses Object.assign', t => {
-  const controller = new Counter();
+  const controller = new DefaultController({ count: 0 });
   t.deepEqual(controller.state, {
     count: 0,
   });
@@ -58,7 +59,7 @@ test('assign uses Object.assign', t => {
 });
 
 test('set changes the state', t => {
-  const controller = new Counter();
+  const controller = new DefaultController({ count: 0 });
   t.deepEqual(controller.state, {
     count: 0,
   });

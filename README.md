@@ -4,14 +4,14 @@ Minimalist state container based on [reactive extensions].
 
 ## Install
 
-> Rinter requires RxJS and Lodash as peer-dependencies
+Rinter requires RxJS as peer-dependency:
 
 ```shell
-npm install rinter rxjs lodash
+npm install rinter rxjs
 ```
 
 ```shell
-yarn add rinter rxjs lodash
+yarn add rinter rxjs
 ```
 
 ## Usage
@@ -39,7 +39,7 @@ console.log(counter.state.number);
 A controller exposes two read-only properties:
 
 - `state`: the current application state, it's an immutable\* plain object
-- `changes`: an [Observable] that emits the state each time it changes.
+- `changes`: a hot [Observable] that emits the state each time it changes.
 
 > \* The framework doesn't enforce immutability by using `Object.freeze`.
 > However, modifying the state directly will lead to bugs and unexpected
@@ -47,29 +47,54 @@ A controller exposes two read-only properties:
 
 Your views should use the methods exposed by the controller to modify the state.
 
-A convenient way to create a controller is to sub-class `AbstractController`. To
-update the state use the protected\* `_set` or `_assign` methods:
-
-> \* JavaScript doesn't have protected methods, so it up to you to maintain the
-> contract.
+A convenient way to create a controller is to sub-class or use
+`DefaultController`. To update the state use the `set` or `assign` methods.
 
 ```js
-import AbstractController from 'rinter';
+import DefaultController from 'rinter';
 
-class Counter extends AbstractController {
+class Counter extends DefaultController {
   constructor(initialValue = { number: 0 }) {
     super(initialValue);
   }
+
   increase() {
-    this._assign({ number: this.state.number + 1 });
+    this.assign({ number: this.state.number + 1 });
   }
 }
 ```
 
-`AbstractController` also has a convenient method to emit only one state change
+JavaScript doesn't have protected methods, but it's recommended to treat `set`
+or `assign` methods as protected. If you are concerned about exposing those
+methods, you can compose `DefaultController` instead of sub-classing it. As long
+your controller has the `state` and `changes` properties, you'll be able to use
+them in other contexts where the library expects a controller:
+
+```js
+class Counter {
+  constructor() {
+    this.controller = new DefaultController();
+  }
+
+  get state() {
+    return this.controller.state;
+  }
+
+  get changes() {
+    return this.controller.changes;
+  }
+
+  increase() {
+    this.controller.assign({ number: this.state.number + 1 });
+  }
+}
+```
+
+`DefaultController` also has a convenient method to emit only one state change
 from multiple actions:
 
 ```js
+// Counter is a sub-class of DefaultController
 const counter = new Counter();
 
 counter.changes.subscribe(state => {
@@ -88,8 +113,8 @@ counter.notifyLastChangeOnly(() => {
 To compose various controllers into one object, you can use a
 `CompositeController`.
 
-A `CompositeController` receives an object with controller factories, 
-and provides the `state` and `changes` properties with the composition:
+A `CompositeController` receives an object with controller factories, and
+provides the `state` and `changes` properties with the composition:
 
 ```js
 import { CompositeController } from 'rinter';
@@ -163,15 +188,52 @@ The [Observable] returned by the `changes` property can be used to trace state
 changes:
 
 ```js
-controller.changes.subscribe(v => console.log(v));
+import { tap } from 'rxjs/operators';
+
+// ...
+const changes = controller.changes.pipe(tap(v => console.log(v)));
+// subscribe to changes instead of controller.changes
+```
+
+### Multiple subscribers
+
+Both `DefaultController` and `CompositeController` are going to generate an
+error if you try to subscribe to changes multiple times without unsubscribing:
+
+```js
+const subscription = controller.changes.subscribe(v => {
+  /*... */
+});
+
+// the observable is going to generate an error (no error is thrown)
+const otherSubscription = controller.changes.subscribe(
+  v => {
+    /*... */
+  },
+  () => {
+    /* error! you must call subscription.unsubscribe() first */
+  }
+);
+```
+
+That behavior is by design. On a front-end app, you usually have only one
+subscriber: the view. If you need to broadcast changes use the `share()`
+operator:
+
+```js
+import { share } from 'rxjs/operators';
+
+const changes = controller.changes.pipe(share());
+
+// now you can subscribe to changes multiple times
 ```
 
 ## Big bundle size
 
-Rinter itself is small, but both RxJS and Lodash are big modules. 
-If your bundle size is big, make sure to use a bundler that
-supports ES6 modules and does [tree-shaking] to remove unnecessary code. For
-example, Webpack 4+ or Rollup supports that, but Webpack 3 doesn't.
+Rinter itself is small, but RxJS is a big module. If your bundle size is big,
+make sure to use a bundler that supports ES6 modules and does [tree-shaking] to
+remove unnecessary code. For example, Webpack 4+ or Rollup supports that, but
+Webpack 3 doesn't.
 
 ## License
 

@@ -1,8 +1,8 @@
 import test from 'ava';
 
-import { create, AbstractController, CompositeController } from '.';
+import { create, DefaultController, CompositeController } from '.';
 
-class Counter extends AbstractController {
+class Counter extends DefaultController {
   constructor(initialValue = { count: 0 }) {
     super(initialValue);
   }
@@ -162,4 +162,22 @@ test('compose deep', t => {
 
   composite.position.x.increment();
   t.is(composite.state.position.x.count, 1);
+});
+
+test('throw error for state child', t => {
+  t.throws(() => {
+    new CompositeController(
+      { state: create(Counter) },
+      { state: { count: 0 } }
+    );
+  }, 'Cannot create the child controller "state". The name clashes with the state property, use another name for the controller.');
+});
+
+test('throw error for changes child', t => {
+  t.throws(() => {
+    new CompositeController(
+      { changes: create(Counter) },
+      { changes: { count: 0 } }
+    );
+  }, 'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.');
 });

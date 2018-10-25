@@ -1,4 +1,4 @@
-export { default as AbstractController } from './AbstractController';
+export { default as DefaultController } from './DefaultController';
 export { default as CompositeController, create } from './CompositeController';
 
-export { default } from './AbstractController';
+export { default } from './DefaultController';
