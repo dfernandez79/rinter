@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
 
 export default class AbstractController {
   constructor(initialState) {
@@ -8,8 +7,11 @@ export default class AbstractController {
     let observer = undefined;
 
     const changes = Observable.create(obs => {
-      if (observer !== undefined)
-        throw new Error('Multiple subscriptions are not supported');
+      if (observer !== undefined) {
+        throw new Error(
+          'This controller changes only supports one subscription at a time. Use share() to multicast changes, or unsubscribe the current subscription.'
+        );
+      }
 
       observer = obs;
 
@@ -19,37 +21,45 @@ export default class AbstractController {
     });
 
     Object.defineProperties(this, {
-      _set: {
-        value: value => {
-          state = value;
+      state: {
+        get() {
+          return state;
+        },
+      },
+
+      changes: {
+        value: changes,
+      },
+
+      set: {
+        value(newState) {
+          state = newState;
           if (!silent && observer !== undefined) {
-            observer.next(value);
+            observer.next(newState);
           }
         },
       },
-      changes: {
-        value: changes.pipe(share()),
+
+      assign: {
+        value: newState => {
+          this.set(Object.assign({}, this.state, newState));
+        },
       },
-      state: {
-        get: () => state,
-      },
+
       notifyLastChangeOnly: {
-        value: fn => {
+        value(fn) {
           silent = true;
+          const prevState = state;
           try {
             fn();
           } finally {
             silent = false;
-            if (observer !== undefined) {
+            if (observer !== undefined && prevState !== state) {
               observer.next(state);
             }
           }
         },
       },
     });
-  }
-
-  _assign(value) {
-    this._set(Object.assign({}, this.state, value));
   }
 }

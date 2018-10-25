@@ -8,27 +8,7 @@ class Counter extends AbstractController {
   }
 
   increment() {
-    this._assign({ count: this.state.count + 1 });
-  }
-}
-
-class StateUpdateTester extends AbstractController {
-  constructor(
-    initialValue = {
-      contents: {
-        value: 1,
-      },
-    }
-  ) {
-    super(initialValue);
-  }
-
-  assign(value) {
-    this._assign(value);
-  }
-
-  set(value) {
-    this._set(value);
+    this.assign({ count: this.state.count + 1 });
   }
 }
 
@@ -63,30 +43,24 @@ test('notify last change only', t => {
   });
 });
 
-test('_assign uses Object.assign', t => {
-  const controller = new StateUpdateTester();
+test('assign uses Object.assign', t => {
+  const controller = new Counter();
   t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-    },
+    count: 0,
   });
 
   controller.assign({ flag: true });
 
   t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-    },
+    count: 0,
     flag: true,
   });
 });
 
-test('_set changes the value', t => {
-  const controller = new StateUpdateTester();
+test('set changes the state', t => {
+  const controller = new Counter();
   t.deepEqual(controller.state, {
-    contents: {
-      value: 1,
-    },
+    count: 0,
   });
 
   controller.set({ flag: true });
@@ -96,21 +70,42 @@ test('_set changes the value', t => {
   });
 });
 
-test('supports multiple subscriptions', t => {
-  t.plan(3);
+test('supports only one subscription', t => {
+  t.plan(2);
   const counter = new Counter();
 
-  counter.changes.subscribe(v => {
-    t.is(v.count, 1);
+  counter.changes.subscribe(() => {
+    t.pass();
   });
 
-  counter.changes.subscribe(v => {
-    t.is(v.count, 1);
-  });
-
-  counter.changes.subscribe(v => {
-    t.is(v.count, 1);
-  });
+  counter.changes.subscribe(
+    () => {
+      t.fail();
+    },
+    () => {
+      t.pass();
+    }
+  );
 
   counter.increment();
+});
+
+test('updates without subscription do not throw', t => {
+  const counter = new Counter();
+
+  t.notThrows(() => counter.increment());
+  t.notThrows(() => {
+    counter.notifyLastChangeOnly(() => {
+      counter.increment();
+      counter.increment();
+    });
+  });
+});
+
+test('Remove subscription', t => {
+  const counter = new Counter();
+  const subscription = counter.changes.subscribe(() => t.fail());
+  subscription.unsubscribe();
+  counter.increment();
+  t.pass();
 });
