@@ -4,7 +4,7 @@ Minimalist state container based on [reactive extensions].
 
 ## Install
 
-Rinter requires RxJS as peer-dependency:
+Rinter requires [RxJS] as peer-dependency:
 
 ```shell
 npm install rinter rxjs
@@ -230,7 +230,7 @@ const changes = controller.changes.pipe(share());
 
 ## Big bundle size
 
-Rinter itself is small, but RxJS is a big module. If your bundle size is big,
+Rinter itself is small, but [RxJS] is a big module. If your bundle size is big,
 make sure to use a bundler that supports ES6 modules and does [tree-shaking] to
 remove unnecessary code. For example, Webpack 4+ or Rollup supports that, but
 Webpack 3 doesn't.
@@ -240,6 +240,7 @@ Webpack 3 doesn't.
 MIT
 
 [reactive extensions]: https://github.com/ReactiveX/rxjs
-[observable]: http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html
+[observable]: http://reactivex.io/documentation/observable.html
 [webpack]: https://webpack.js.org
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
+[RxJS]: https://github.com/ReactiveX/rxjs
