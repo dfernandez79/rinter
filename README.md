@@ -7,7 +7,7 @@ Minimalist state container based on [reactive extensions].
 Rinter requires [RxJS] as peer-dependency:
 
 ```shell
-npm install rinter rxjs
+npm install --save rinter rxjs
 ```
 
 ```shell
@@ -195,6 +195,29 @@ const changes = controller.changes.pipe(tap(v => console.log(v)));
 // subscribe to changes instead of controller.changes
 ```
 
+However, setting up this in an app that passes references to the controller
+instead to the observer can be annoying. The good news is that you can use the
+debug utility function to create a proxy to trace state changes:
+
+```js
+import debug from 'rinter/debug';
+
+const controller = debug(new MyApp(), {
+  stateChange(value) {
+    console.log(value);
+  },
+});
+```
+
+By default, debug will be silent, but you can make it verbose without having to
+configure all the options:
+
+```js
+import debug, { DEBUG_VERBOSE } from 'rinter/debug';
+
+const controller = debug(new MyApp(), DEBUG_VERBOSE);
+```
+
 ### Multiple subscribers
 
 Both `DefaultController` and `CompositeController` are going to generate an
@@ -243,4 +266,4 @@ MIT
 [observable]: http://reactivex.io/documentation/observable.html
 [webpack]: https://webpack.js.org
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
-[RxJS]: https://github.com/ReactiveX/rxjs
+[rxjs]: https://github.com/ReactiveX/rxjs
