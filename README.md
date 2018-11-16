@@ -209,13 +209,13 @@ const controller = debug(new MyApp(), {
 });
 ```
 
-By default, debug will be silent, but you can make it verbose without having to
-configure all the options:
+By default, debug will be verbose logging every state change, but you can make
+it silent without having to configure all the options:
 
 ```js
 import { debug } from 'rinter';
 
-const controller = debug(new MyApp(), debug.VERBOSE);
+const controller = debug(new MyApp(), debug.SILENT);
 ```
 
 ### Multiple subscribers
