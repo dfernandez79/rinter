@@ -4,7 +4,7 @@
   "description": "Minimalist state container based on reactive extensions",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
-  "repository": "https://github.com/rinterjs/rinter.git",
+  "repository": "https://github.com/dfernandez79/rinter.git",
   "author": "Diego Fernandez <diegof79@gmail.com>",
   "license": "MIT",
   "sideEffects": false,
