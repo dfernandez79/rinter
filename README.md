@@ -200,7 +200,7 @@ instead to the observer can be annoying. The good news is that you can use the
 debug utility function to create a proxy to trace state changes:
 
 ```js
-import debug from 'rinter/debug';
+import { debug } from 'rinter';
 
 const controller = debug(new MyApp(), {
   stateChange(value) {
@@ -213,9 +213,9 @@ By default, debug will be silent, but you can make it verbose without having to
 configure all the options:
 
 ```js
-import debug, { DEBUG_VERBOSE } from 'rinter/debug';
+import { debug } from 'rinter';
 
-const controller = debug(new MyApp(), DEBUG_VERBOSE);
+const controller = debug(new MyApp(), debug.VERBOSE);
 ```
 
 ### Multiple subscribers
