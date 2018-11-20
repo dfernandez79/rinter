@@ -180,6 +180,68 @@ const composite = new CompositeController(
 );
 ```
 
+## Migrating from Redux
+
+By using decorators, it's possible to define methods that receive the current
+state and returns a new state:
+
+```js
+import { mutator, DefaultController } from 'rinter';
+
+class Counter extends DefaultController {
+  @mutator
+  increment(state) {
+    return { count: state.count + 1 };
+  }
+}
+
+// usage
+const controller = new Counter({ count: 0 });
+controller.increase();
+```
+
+The decorators are also helpful to migrate reducers from Redux:
+
+```js
+// Usually Redux code is refactored to use one function per action type
+
+function increment(state) {
+  return { count: state.count + 1 };
+}
+function decrement(state) {
+  return { count: state.count - 1 };
+}
+
+function counter(state = { count: 0 }, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return increment(state);
+    case 'DECREMENT':
+      return decrement(state);
+    default:
+      return state;
+  }
+}
+```
+
+Using the `@mutator` decorator, the migration is straight forward:
+
+```js
+import { mutator, DefaultController } from 'rinter';
+
+class Counter extends DefaultController {
+  @mutator
+  increment(state) {
+    return { count: state.count + 1 };
+  }
+
+  @mutator
+  decrement(state) {
+    return { count: state.count - 1 };
+  }
+}
+```
+
 ## Troubleshooting
 
 ### Log state changes
@@ -251,7 +313,7 @@ const changes = controller.changes.pipe(share());
 // now you can subscribe to changes multiple times
 ```
 
-## Big bundle size
+### Big bundle size
 
 Rinter itself is small, but [RxJS] is a big module. If your bundle size is big,
 make sure to use a bundler that supports ES6 modules and does [tree-shaking] to

@@ -9,5 +9,8 @@
       }
     ]
   ],
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": false }]
+  ],
   "ignore": ["src/**/*.test.js"]
 }
