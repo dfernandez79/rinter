@@ -1,24 +1,24 @@
 import test from 'ava';
 
-import { overwriteState, mutator, DefaultController } from '.';
+import { set, assign, DefaultController } from '.';
 
 class Counter extends DefaultController {
-  @mutator
+  @assign
   increment(state) {
     return { count: state.count + 1 };
   }
 
-  @mutator
+  @assign
   add(state, n) {
     return { count: state.count + n };
   }
 
-  @mutator
+  @assign
   addProp(state, prop) {
     return prop;
   }
 
-  @overwriteState
+  @set
   reset() {
     return { reset: true };
   }
@@ -36,13 +36,13 @@ test('pass arguments to mutator function', t => {
   t.is(controller.state.count, 20);
 });
 
-test('assign by default', t => {
+test('assign state', t => {
   const controller = new Counter({ count: 0 });
   controller.addProp({ prop: true });
   t.deepEqual(controller.state, { count: 0, prop: true });
 });
 
-test('overwrite state', t => {
+test('set state', t => {
   const controller = new Counter({ count: 1 });
   controller.reset();
   t.deepEqual(controller.state, { reset: true });

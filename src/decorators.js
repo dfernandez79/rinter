@@ -16,10 +16,10 @@ function createMutator(elementDescriptor, overwrite = false) {
   });
 }
 
-export function mutator(elementDescriptor) {
+export function assign(elementDescriptor) {
   return createMutator(elementDescriptor);
 }
 
-export function overwriteState(elementDescriptor) {
+export function set(elementDescriptor) {
   return createMutator(elementDescriptor, true);
 }
