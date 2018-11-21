@@ -186,10 +186,10 @@ By using decorators, it's possible to define methods that receive the current
 state and returns a new state:
 
 ```js
-import { mutator, DefaultController } from 'rinter';
+import { assign, DefaultController } from 'rinter';
 
 class Counter extends DefaultController {
-  @mutator
+  @assign
   increment(state) {
     return { count: state.count + 1 };
   }
@@ -200,19 +200,19 @@ const controller = new Counter({ count: 0 });
 controller.increase();
 ```
 
-The decorators are also helpful to migrate reducers from Redux:
+The decorators are also helpful to migrate reducers from [Redux]:
 
 ```js
 // Usually Redux code is refactored to use one function per action type
 
 function increment(state) {
-  return { count: state.count + 1 };
+  return state.count + 1;
 }
 function decrement(state) {
-  return { count: state.count - 1 };
+  return state.count - 1;
 }
 
-function counter(state = { count: 0 }, action) {
+function counter(state = 0, action) {
   switch (action.type) {
     case 'INCREMENT':
       return increment(state);
@@ -224,23 +224,98 @@ function counter(state = { count: 0 }, action) {
 }
 ```
 
-Using the `@mutator` decorator, the migration is straight forward:
+Using the `@set` decorator, the migration is straight forward:
 
 ```js
 import { mutator, DefaultController } from 'rinter';
 
 class Counter extends DefaultController {
-  @mutator
+  @set
   increment(state) {
-    return { count: state.count + 1 };
+    return state.count + 1;
   }
 
-  @mutator
+  @set
   decrement(state) {
-    return { count: state.count - 1 };
+    return state.count - 1;
   }
 }
 ```
+
+Decorators are [proposed as a JavaScript enhancement] but are not standardized
+yet. Your project needs to include the proper [Babel plugins] to support
+decorators.
+
+Note that decorators are implemented as functions, meaning that rinter doesn't
+require decorators support to work.
+
+Another migration alternative is to create a factory function that creates a
+controller from your reducer functions. You only need to comply with a minimal
+interface of two getters: `state` and `changes`.
+
+## API reference
+
+## Top-level exports
+
+**Classes**
+
+- [DefaultController](#defaultcontroller)
+- CompositeController
+
+**Functions**
+
+- create
+- debug
+
+**Decorators**
+
+- assign
+- set
+
+### DefaultController
+
+#### Constructor
+
+`new DefaultController(initialValue)`
+
+Creates a controller instance with the given initial state.
+
+#### Properties
+
+- `state`: Read only. The current state value.
+- `changes`: Read only. A hot [Observable] that emits the state each time it
+  changes.
+
+#### Methods
+
+- `set(newState)`: Sets the state to `newState` and emits a state change.
+- `assign(newState)`: Asumes that state is an object and uses `Object.assign` to
+  update the state. It is equivalent to:
+  `this.set(Object.assign({}, this.state, newState))`
+- `notifyLastChangeOnly(fn)`: Mutes the emission of state changes during the
+  execution of `fn`. It will emit a state change after executing `fn`.
+
+### CompositeController
+
+Sub-class of [DefaultController](#defaultcontroller). It composes controllers
+into one object, for example a composite of:
+
+```js
+{ a: controller1, b: controller2 }
+```
+
+will return the state:
+
+```js
+{ a: controller1.state, b: controller2.state }
+```
+
+#### Constructor
+
+`new CompositeController(factories, initialValue)`
+
+The `factories` parameter specifies the shape of the composition and how to
+create each sub-controller.
 
 ## Troubleshooting
 
@@ -329,3 +404,8 @@ MIT
 [webpack]: https://webpack.js.org
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [rxjs]: https://github.com/ReactiveX/rxjs
+[redux]: https://redux.js.org/
+[babel plugins]:
+  https://babeljs.io/docs/en/next/babel-plugin-proposal-decorators.html
+[proposed as a javascript enhancement]:
+  https://github.com/tc39/proposal-decorators
