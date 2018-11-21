@@ -255,7 +255,7 @@ interface of two getters: `state` and `changes`.
 
 ## API reference
 
-## Top-level exports
+### Top-level exports
 
 **Classes**
 
