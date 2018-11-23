@@ -28,9 +28,9 @@ const createChildren = (factories, initialValue) => {
 
 export const create = ctor => initialValue => new ctor(initialValue);
 
-export default class CompositeController extends DefaultController {
+export default class CompositeController {
   constructor(factories, initialState) {
-    super(initialState);
+    const controller = new DefaultController(initialState);
 
     const { childKeys, children } = createChildren(factories, initialState);
 
@@ -41,7 +41,7 @@ export default class CompositeController extends DefaultController {
       )
     );
 
-    merge(...childObservers).subscribe(keyValue => this.assign(keyValue));
+    merge(...childObservers).subscribe(keyValue => controller.assign(keyValue));
 
     Object.defineProperties(
       this,
@@ -50,5 +50,19 @@ export default class CompositeController extends DefaultController {
         return props;
       }, {})
     );
+
+    Object.defineProperties(this, {
+      changes: { value: controller.changes },
+      state: {
+        get() {
+          return controller.state;
+        },
+      },
+      notifyLastChangeOnly: {
+        value(fn) {
+          return controller.notifyLastChangeOnly(fn);
+        },
+      },
+    });
   }
 }

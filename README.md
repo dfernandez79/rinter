@@ -260,7 +260,7 @@ interface of two getters: `state` and `changes`.
 **Classes**
 
 - [DefaultController](#defaultcontroller)
-- CompositeController
+- [CompositeController](#compositecontroller)
 
 **Functions**
 
@@ -273,6 +273,22 @@ interface of two getters: `state` and `changes`.
 - set
 
 ### DefaultController
+
+> **Author's note about controller implementation:**
+>
+> There are many ways to create objects in JavaScript: define instances directly
+> using closures to handle private state, define instances using prototypical
+> inheritance, or define instances using a class. While this library uses
+> classes, it defines some properties like `state` and `changes` directly using
+> `Object.defineProperty` with the `configurable` and `writable` flags set to
+> `false`. This approach limits extension, but helps to enforce the state scope.
+> Many times I considered taking different approaches: abandon the class syntax
+> in favor of some custom object creation (like in [Vuex]); use private fields
+> with Babel plugins; use fields with some prefix (like `_`) to indicate that
+> you should not touch them. But, I keep using the `defineProperty` in the
+> constructor: 99% of the time you shouldn't need to override or extend the
+> `state` or `changes` properties, and for the 1%, you can use composition. I'll
+> reconsider it if it's problematic.
 
 #### Constructor
 
@@ -297,8 +313,8 @@ Creates a controller instance with the given initial state.
 
 ### CompositeController
 
-Sub-class of [DefaultController](#defaultcontroller). It composes controllers
-into one object, for example a composite of:
+A `CompositeController` composes controllers into one object, for example a
+composite of:
 
 ```js
 { a: controller1, b: controller2 }
@@ -315,7 +331,36 @@ will return the state:
 `new CompositeController(factories, initialValue)`
 
 The `factories` parameter specifies the shape of the composition and how to
-create each sub-controller.
+create each sub-controller. It's an object of the kind `{key: factoryFunction}`,
+where `factoryFunction` receives an initial value and returns a controller.
+
+Example:
+
+```js
+const composite = new CompositeController({
+  controllerA: initialState => createAController(initialState),
+  controllerB: initialState => new DefaultController(initialState),
+});
+```
+
+Also the new composite controller instance will have an enumerable property for
+each sub-controller:
+
+```js
+composite.controllerA; // returns a controller instance
+composite.controllerB; // returns a DefaultController instance
+```
+
+#### Properties
+
+- `state`: Read only. The current state value.
+- `changes`: Read only. A hot [Observable] that emits the state each time it
+  changes.
+
+#### Methods
+
+- `notifyLastChangeOnly(fn)`: Mutes the emission of state changes during the
+  execution of `fn`. It will emit a state change after executing `fn`.
 
 ## Troubleshooting
 
@@ -409,3 +454,4 @@ MIT
   https://babeljs.io/docs/en/next/babel-plugin-proposal-decorators.html
 [proposed as a javascript enhancement]:
   https://github.com/tc39/proposal-decorators
+[vuex]: https://vuex.vuejs.org/
