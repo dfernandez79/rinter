@@ -19,9 +19,9 @@ const createChildren = (factories, initialState) => {
       typeof factory === 'function'
         ? factory(initialState !== undefined ? initialState[key] : undefined)
         : new CompositeController(
-            factory,
-            initialState !== undefined ? initialState[key] : undefined
-          );
+          factory,
+          initialState !== undefined ? initialState[key] : undefined
+        );
 
     return props;
   }, {});
