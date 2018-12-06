@@ -1,6 +1,9 @@
 # Sources
 src/
 
+# Docs
+docs/
+
 # Test
 *.test.js
 
