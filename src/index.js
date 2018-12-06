@@ -1,5 +1,5 @@
 export { default as DefaultController } from './DefaultController';
-export { default as CompositeController, create } from './CompositeController';
+export { default as CompositeController, create, compose } from './CompositeController';
 
 export { assign, set } from './decorators';
 export { default as debug } from './debug';

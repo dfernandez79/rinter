@@ -3,7 +3,7 @@ import { filter, map } from 'rxjs/operators';
 
 import DefaultController from './DefaultController';
 
-const createChildren = (factories, initialValue) => {
+const createChildren = (factories, initialState) => {
   const childKeys = Object.keys(factories);
 
   const children = childKeys.reduce((props, key) => {
@@ -17,8 +17,11 @@ const createChildren = (factories, initialValue) => {
 
     props[key] =
       typeof factory === 'function'
-        ? factory(initialValue[key])
-        : new CompositeController(factory, initialValue[key]);
+        ? factory(initialState !== undefined ? initialState[key] : undefined)
+        : new CompositeController(
+            factory,
+            initialState !== undefined ? initialState[key] : undefined
+          );
 
     return props;
   }, {});
@@ -28,11 +31,25 @@ const createChildren = (factories, initialValue) => {
 
 export const create = ctor => initialValue => new ctor(initialValue);
 
+export const compose = (factories, initialState) =>
+  new CompositeController(factories, initialState);
+
 export default class CompositeController {
   constructor(factories, initialState) {
-    const controller = new DefaultController(initialState);
+    const controller = new DefaultController(
+      initialState !== undefined ? initialState : {}
+    );
 
     const { childKeys, children } = createChildren(factories, initialState);
+
+    if (initialState === undefined) {
+      controller.set(
+        childKeys.reduce((props, key) => {
+          props[key] = children[key].state;
+          return props;
+        }, {})
+      );
+    }
 
     const childObservers = childKeys.map(key =>
       children[key].changes.pipe(

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { create, DefaultController, CompositeController } from '.';
+import { create, compose, DefaultController, CompositeController } from '.';
 
 class Counter extends DefaultController {
   constructor(initialValue = { count: 0 }) {
@@ -180,4 +180,27 @@ test('throw error for changes child', t => {
       { changes: { count: 0 } }
     );
   }, 'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.');
+});
+
+test('Create using compose function', t => {
+  const initialState = { a: { count: 1 }, b: { count: 1 } };
+
+  const composite = compose(
+    {
+      a: create(Counter),
+      b: create(Counter),
+    },
+    initialState
+  );
+
+  t.is(composite.state, initialState);
+});
+
+test('Create without initial state', t => {
+  const composite = compose({
+    a: create(Counter),
+    b: create(Counter),
+  });
+
+  t.deepEqual(composite.state, { a: { count: 0 }, b: { count: 0 } });
 });
