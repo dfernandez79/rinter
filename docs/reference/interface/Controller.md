@@ -1,4 +1,4 @@
-# Interface `Controller`
+# Controller interface
 
 JavaScript doesn't have support for interfaces or types, but for documentation
 purposes, this document describes the controller objects used by this library.

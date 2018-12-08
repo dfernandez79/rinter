@@ -127,3 +127,6 @@ MIT
 [controller]: ./docs/reference/functions/controller.md
 [compose]: ./docs/reference/functions/compose.md
 [debug]: ./docs/reference/functions/debug.md
+
+[DefaultController]: ./docs/reference/classes/DefaultController.md
+[CompositeController]: ./docs/reference/classes/CompositeController.md

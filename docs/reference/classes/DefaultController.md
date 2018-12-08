@@ -1,4 +1,4 @@
-# Class `DefaultController`
+# DefaultController class
 
 ## Constructor
 

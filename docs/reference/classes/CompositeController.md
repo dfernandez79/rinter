@@ -1,4 +1,4 @@
-# class `CompositeController`
+# CompositeController class
 
 A `CompositeController` composes controllers into one object, for example a
 composite of:

@@ -1,4 +1,4 @@
-# Function `compose`
+# compose function
 
 ```js
 compose(
