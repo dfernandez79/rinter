@@ -1,24 +1,23 @@
 import test from 'ava';
 
-import { create, compose, DefaultController, CompositeController } from '.';
+import { controller, CompositeController } from '.';
 
-class Counter extends DefaultController {
-  constructor(initialValue = { count: 0 }) {
-    super(initialValue);
-  }
-
-  increment() {
-    this.assign({ count: this.state.count + 1 });
-  }
-}
+const counter = controller({
+  initialState: { count: 0 },
+  mutators: {
+    increment(state) {
+      return { count: state.count + 1 };
+    },
+  },
+});
 
 test('create from factories and initial value', t => {
   const initialState = { a: { count: 1 }, b: { count: 1 } };
 
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     initialState
   );
@@ -29,20 +28,26 @@ test('create from factories and initial value', t => {
 test('accessors for child controllers', t => {
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     {}
   );
 
-  t.true(composite.a instanceof Counter);
-  t.true(composite.b instanceof Counter);
+  t.true('state' in composite.a);
+  t.true('changes' in composite.a);
+  t.true('notifyLastChangeOnly' in composite.a);
+  t.true('increment' in composite.a);
+  t.true('state' in composite.b);
+  t.true('changes' in composite.b);
+  t.true('notifyLastChangeOnly' in composite.b);
+  t.true('increment' in composite.b);
 });
 
 test('readonly accessors for child controllers', t => {
   const composite = new CompositeController(
     {
-      a: create(Counter),
+      a: counter,
     },
     {}
   );
@@ -57,8 +62,8 @@ test('readonly accessors for child controllers', t => {
 test('child accessors are enumerable', t => {
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     {}
   );
@@ -75,8 +80,8 @@ test('report changes from children', t => {
 
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     {
       a: { count: 1 },
@@ -98,8 +103,8 @@ test('do not notify initial state', t => {
   const initial = { a: 1, b: 2 };
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     initial
   );
@@ -112,8 +117,8 @@ test('notify last change only', t => {
 
   const composite = new CompositeController(
     {
-      a: create(Counter),
-      b: create(Counter),
+      a: counter,
+      b: counter,
     },
     {
       a: { count: 1 },
@@ -143,8 +148,8 @@ test('notify last change only', t => {
 test('compose deep', t => {
   const composite = new CompositeController(
     {
-      position: { x: create(Counter), y: create(Counter) },
-      size: { width: create(Counter), height: create(Counter) },
+      position: { x: counter, y: counter },
+      size: { width: counter, height: counter },
     },
     {
       position: { x: { count: 0 }, y: { count: 0 } },
@@ -166,41 +171,12 @@ test('compose deep', t => {
 
 test('throw error for state child', t => {
   t.throws(() => {
-    new CompositeController(
-      { state: create(Counter) },
-      { state: { count: 0 } }
-    );
+    new CompositeController({ state: counter }, { state: { count: 0 } });
   }, 'Cannot create the child controller "state". The name clashes with the state property, use another name for the controller.');
 });
 
 test('throw error for changes child', t => {
   t.throws(() => {
-    new CompositeController(
-      { changes: create(Counter) },
-      { changes: { count: 0 } }
-    );
+    new CompositeController({ changes: counter }, { changes: { count: 0 } });
   }, 'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.');
-});
-
-test('Create using compose function', t => {
-  const initialState = { a: { count: 1 }, b: { count: 1 } };
-
-  const composite = compose(
-    {
-      a: create(Counter),
-      b: create(Counter),
-    },
-    initialState
-  );
-
-  t.is(composite.state, initialState);
-});
-
-test('Create without initial state', t => {
-  const composite = compose({
-    a: create(Counter),
-    b: create(Counter),
-  });
-
-  t.deepEqual(composite.state, { a: { count: 0 }, b: { count: 0 } });
 });

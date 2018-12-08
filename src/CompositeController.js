@@ -29,11 +29,6 @@ const createChildren = (factories, initialState) => {
   return { childKeys, children };
 };
 
-export const create = ctor => initialValue => new ctor(initialValue);
-
-export const compose = (factories, initialState) =>
-  new CompositeController(factories, initialState);
-
 export default class CompositeController {
   constructor(factories, initialState) {
     const controller = new DefaultController(

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import DefaultController from '.';
+import { DefaultController } from '.';
 
 class Counter extends DefaultController {
   constructor(initialValue = { count: 0 }) {
