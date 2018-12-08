@@ -1,4 +1,4 @@
-# CompositeController class
+# _CompositeController_ class
 
 A `CompositeController` composes controllers into one object, for example a
 composite of:
@@ -15,7 +15,9 @@ will return the state:
 
 ## Constructor
 
-`new CompositeController(factories, [initialState])`
+```js
+new CompositeController(factories, [initialState])
+```
 
 The `factories` parameter specifies the shape of the composition and how to
 create each sub-controller. It's an object of the kind `{key: factoryFunction}`,

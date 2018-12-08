@@ -1,4 +1,4 @@
-# debug function
+# _debug_ function
 
 ```js
 debug(

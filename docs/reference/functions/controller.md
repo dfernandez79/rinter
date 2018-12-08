@@ -1,4 +1,4 @@
-# controller function
+# _controller_ function
 
 ```js
 controller({

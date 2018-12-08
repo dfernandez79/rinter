@@ -1,8 +1,10 @@
-# DefaultController class
+# _DefaultController_ class
 
 ## Constructor
 
-`new DefaultController(initialValue)`
+```js
+new DefaultController(initialValue)
+```
 
 Creates a [controller] instance with the given initial state.
 
