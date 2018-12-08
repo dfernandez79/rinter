@@ -19,7 +19,7 @@ will return the state:
 
 The `factories` parameter specifies the shape of the composition and how to
 create each sub-controller. It's an object of the kind `{key: factoryFunction}`,
-where `factoryFunction` receives an initial state and returns a controller.
+where `factoryFunction` receives an initial state and returns a [controller].
 
 The `initialState` parameter is optional, and when omited the controller builds
 the initial state from the children default initial states.
@@ -51,3 +51,5 @@ composite.controllerB; // returns a DefaultController instance
 
 - `notifyLastChangeOnly(fn)`: Mutes the emission of state changes during the
   execution of `fn`. It will emit a state change after executing `fn`.
+
+[controller]: ../interface/Controller.md

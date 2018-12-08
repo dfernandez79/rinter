@@ -1,275 +1,35 @@
 # Rinter
 
-Minimalist state container based on [reactive extensions].
+Rinter it's a minimalist state container based on [reactive extensions].
 
-## Install
+## Installation
 
-Rinter requires [RxJS] as peer-dependency:
+Rinter requires [RxJS] as peer-dependency.
+
+To install it using [NPM]:
 
 ```shell
 npm install --save rinter rxjs
 ```
 
+To install it using [Yarn]:
+
 ```shell
 yarn add rinter rxjs
 ```
 
-## Usage
-
-Instead of mutating your application state directly:
-
-```js
-const state = { number: 0 };
-
-// ...
-state.number = state.number + 1;
-console.log(state.number); // 1
-```
-
-Use a controller:
-
-```js
-const counter = new CounterController({ number: 0 });
-
-// ...
-counter.increase();
-console.log(counter.state.number);
-```
-
-A controller exposes two read-only properties:
-
-- `state`: the current application state, it's an immutable\* plain object
-- `changes`: a hot [Observable] that emits the state each time it changes.
-
-> \* The framework doesn't enforce immutability by using `Object.freeze`.
-> However, modifying the state directly will lead to bugs and unexpected
-> side-effects.
-
-Your views should use the methods exposed by the controller to modify the state.
-
-A convenient way to create a controller is to sub-class or use
-`DefaultController`. To update the state use the `set` or `assign` methods.
-
-```js
-import DefaultController from 'rinter';
-
-class Counter extends DefaultController {
-  constructor(initialValue = { number: 0 }) {
-    super(initialValue);
-  }
-
-  increase() {
-    this.assign({ number: this.state.number + 1 });
-  }
-}
-```
-
-JavaScript doesn't have protected methods, but it's recommended to treat `set`
-or `assign` methods as protected. If you are concerned about exposing those
-methods, you can compose `DefaultController` instead of sub-classing it. As long
-your controller has the `state` and `changes` properties, you'll be able to use
-them in other contexts where the library expects a controller:
-
-```js
-class Counter {
-  constructor() {
-    this.controller = new DefaultController();
-  }
-
-  get state() {
-    return this.controller.state;
-  }
-
-  get changes() {
-    return this.controller.changes;
-  }
-
-  increase() {
-    this.controller.assign({ number: this.state.number + 1 });
-  }
-}
-```
-
-`DefaultController` also has a convenient method to emit only one state change
-from multiple actions:
-
-```js
-// Counter is a sub-class of DefaultController
-const counter = new Counter();
-
-counter.changes.subscribe(state => {
-  console.log(state);
-});
-
-counter.notifyLastChangeOnly(() => {
-  counter.increase();
-  counter.increase();
-  counter.increase();
-});
-
-// will output only {number: 3}
-```
-
-To compose various controllers into one object, you can use a
-`CompositeController`.
-
-A `CompositeController` receives an object with controller factories, and
-provides the `state` and `changes` properties with the composition:
-
-```js
-import { CompositeController } from 'rinter';
-
-const composite = new CompositeController(
-  {
-    first: value => new Counter(value),
-    second: value => new Counter(value),
-  },
-  { first: { number: 0 }, second: { number: 42 } }
-);
-
-console.log(composite.state);
-// output:
-// {first: {number:0}, second: {number:42}
-```
-
-It also generates accessors for each controller:
-
-```js
-controller.first.increase();
-console.log(controller.state);
-// output:
-// {first: {number:1}, second: {number:42}
-
-controller.changes.subscribe(state => console.log(state));
-controller.second.increase();
-controller.second.increase();
-
-// will output:
-// {first: {number:1}, second: {number:43}
-// {first: {number:1}, second: {number:44}
-```
-
-Since the properties `state` and `changes` are part of the controller contract,
-you cannot use those names to identify controllers:
-
-```js
-// ERROR! clashes with composite.state
-new CompositeController({ state: value => MyController(value) }, { state: {} });
-
-// OK - {state:10} is the initial value for Other
-new CompositeController(
-  { other: value => Other(value) },
-  { other: { state: 10 } }
-);
-```
-
-Is expected that controller constructors receive the initial state value as the
-first argument. If that is the case, you can use the `create` function to make
-the `CompositeController` definition shorter:
-
-```js
-import { create } from 'rinter';
-
-// ...
-const composite = new CompositeController(
-  {
-    first: create(Counter),
-    second: create(Counter),
-  },
-  { first: { number: 0 }, second: { number: 42 } }
-);
-```
-
-## Migrating from Redux
-
-By using decorators, it's possible to define methods that receive the current
-state and returns a new state:
-
-```js
-import { assign, DefaultController } from 'rinter';
-
-class Counter extends DefaultController {
-  @assign
-  increment(state) {
-    return { count: state.count + 1 };
-  }
-}
-
-// usage
-const controller = new Counter({ count: 0 });
-controller.increase();
-```
-
-The decorators are also helpful to migrate reducers from [Redux]:
-
-```js
-// Usually Redux code is refactored to use one function per action type
-
-function increment(state) {
-  return state.count + 1;
-}
-function decrement(state) {
-  return state.count - 1;
-}
-
-function counter(state = 0, action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return increment(state);
-    case 'DECREMENT':
-      return decrement(state);
-    default:
-      return state;
-  }
-}
-```
-
-Using the `@set` decorator, the migration is straight forward:
-
-```js
-import { mutator, DefaultController } from 'rinter';
-
-class Counter extends DefaultController {
-  @set
-  increment(state) {
-    return state.count + 1;
-  }
-
-  @set
-  decrement(state) {
-    return state.count - 1;
-  }
-}
-```
-
-Decorators are [proposed as a JavaScript enhancement] but are not standardized
-yet. Your project needs to include the proper [Babel plugins] to support
-decorators.
-
-Note that decorators are implemented as functions, meaning that rinter doesn't
-require decorators support to work.
-
-Another migration alternative is to create a factory function that creates a
-controller from your reducer functions. You only need to comply with a minimal
-interface of two getters: `state` and `changes`.
-
 ## API reference
-
-### Classes
-
-- [DefaultController](./docs/reference/classes/DefaultController.md)
-- [CompositeController](./docs/reference/classes/CompositeController.md)
 
 ### Functions
 
-- [compose](./docs/reference/functions/compose.md)
-- [create](./docs/reference/functions/create.md)
-- [debug](./docs/reference/functions/debug.md)
+- [controller]
+- [compose]
+- [debug]
 
-### Decorators
+### Classes
 
-- [assign](./docs/reference/functions/assign.md)
-- [set](./docs/reference/functions/set.md)
+- [DefaultController]
+- [CompositeController]
 
 ## Troubleshooting
 
@@ -288,7 +48,7 @@ const changes = controller.changes.pipe(tap(v => console.log(v)));
 
 However, setting up this in an app that passes references to the controller
 instead to the observer can be annoying. The good news is that you can use the
-debug utility function to create a proxy to trace state changes:
+[debug] utility function to create a proxy to trace state changes:
 
 ```js
 import { debug } from 'rinter';
@@ -300,8 +60,8 @@ const controller = debug(new MyApp(), {
 });
 ```
 
-By default, debug will be verbose logging every state change, but you can make
-it silent without having to configure all the options:
+By default, [debug] will be verbose logging every state change, but you can mute
+it without having to configure all the options:
 
 ```js
 import { debug } from 'rinter';
@@ -312,14 +72,16 @@ const controller = debug(new MyApp(), debug.SILENT);
 ### Multiple subscribers
 
 Both `DefaultController` and `CompositeController` are going to generate an
-error if you try to subscribe to changes multiple times without unsubscribing:
+error if you try to subscribe to `changes` multiple times without unsubscribing:
 
 ```js
 const subscription = controller.changes.subscribe(v => {
   /*... */
 });
 
-// the observable is going to generate an error (no error is thrown)
+// The observable is going to generate an error.
+// Note that per RxJS design subscribe doesn't throw an exception,
+// it emits an error event.
 const otherSubscription = controller.changes.subscribe(
   v => {
     /*... */
@@ -331,8 +93,8 @@ const otherSubscription = controller.changes.subscribe(
 ```
 
 That behavior is by design. On a front-end app, you usually have only one
-subscriber: the view. If you need to broadcast changes use the `share()`
-operator:
+subscriber: the view. If you need to broadcast changes use the [RxJS]'s
+`share()` operator:
 
 ```js
 import { share } from 'rxjs/operators';
@@ -346,7 +108,7 @@ const changes = controller.changes.pipe(share());
 
 Rinter itself is small, but [RxJS] is a big module. If your bundle size is big,
 make sure to use a bundler that supports ES6 modules and does [tree-shaking] to
-remove unnecessary code. For example, Webpack 4+ or Rollup supports that, but
+remove unnecessary code. For example, [Webpack] 4+ or [Rollup] supports that, but
 Webpack 3 doesn't.
 
 ## License
@@ -354,12 +116,14 @@ Webpack 3 doesn't.
 MIT
 
 [reactive extensions]: https://github.com/ReactiveX/rxjs
-[observable]: http://reactivex.io/documentation/observable.html
-[webpack]: https://webpack.js.org
-[tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [rxjs]: https://github.com/ReactiveX/rxjs
-[redux]: https://redux.js.org/
-[babel plugins]:
-  https://babeljs.io/docs/en/next/babel-plugin-proposal-decorators.html
-[proposed as a javascript enhancement]:
-  https://github.com/tc39/proposal-decorators
+[npm]: https://www.npmjs.com/
+[yarn]: https://yarnpkg.com/
+[observable]: http://reactivex.io/documentation/observable.html
+[tree-shaking]: https://webpack.js.org/guides/tree-shaking/
+[webpack]: https://webpack.js.org
+[rollup]: https://rollupjs.org/
+
+[controller]: ./docs/reference/functions/controller.md
+[compose]: ./docs/reference/functions/compose.md
+[debug]: ./docs/reference/functions/debug.md
