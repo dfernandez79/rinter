@@ -32,14 +32,14 @@ and decrease.
 An immutable object describes the application state. And the actions generates a
 new instance of the application state:
 
-![Diagram displaying an action called increase that creates a new state](./docs/images/introduction-diagram-2.png)
+<img src="./docs/images/introduction-diagram-2.png" alt="Diagram displaying an action called increase that creates a new state" width="383">
 
 Rinter represents this architecture with an object called [Controller]. A
 controller has a `state` property that returns the current state value. It also
 has methods to modify the state. The view is able to detect changes by the
 `changes` property.
 
-![Diagram of the Rinter architecture](./docs/images/introduction-diagram-3.png)
+<img src="./docs/images/introduction-diagram-3.png" alt="Diagram of the Rinter architecture" width="510">
 
 In code:
 
