@@ -18,6 +18,55 @@ To install it using [Yarn]:
 yarn add rinter rxjs
 ```
 
+## Getting started
+
+Rinter is similar to [Redux], [MobX] or [Vuex]: it allows you to handle the
+application state in a centralized and predictable way.
+
+To get started we are going to follow the usual example of a number (aka
+"Counter"). Imagine an application that shows a number and two actions: increase
+and decrease.
+
+<img src="./docs/images/introduction-diagram-1.png" alt="Application displaying a number and two buttons: plus and minus" width="225">
+
+An immutable object describes the application state. And the actions generates a
+new instance of the application state:
+
+![Diagram displaying an action called increase that creates a new state](./docs/images/introduction-diagram-2.png)
+
+Rinter represents this architecture with an object called [Controller]. A
+controller has a `state` property that returns the current state value. It also
+has methods to modify the state. The view is able to detect changes by the
+`changes` property.
+
+![Diagram of the Rinter architecture](./docs/images/introduction-diagram-3.png)
+
+In code:
+
+```js
+const counter = controller({
+  mutators: {
+    increase(state) {
+      return state + 1;
+    },
+    decrease(state) {
+      return state - 1;
+    },
+  },
+});
+
+const appCounter = counter(0);
+
+appCounter.subscribe(state => {
+  // renderView is an example of how the view will respond to state
+  // changes and send callbacks to update the state
+  renderView(state, {
+    onIncreaseClick: appCounter.increase,
+    onDecreaseClick: appCounter.decrease,
+  });
+});
+```
+
 ## API reference
 
 ### Functions
@@ -108,8 +157,8 @@ const changes = controller.changes.pipe(share());
 
 Rinter itself is small, but [RxJS] is a big module. If your bundle size is big,
 make sure to use a bundler that supports ES6 modules and does [tree-shaking] to
-remove unnecessary code. For example, [Webpack] 4+ or [Rollup] supports that, but
-Webpack 3 doesn't.
+remove unnecessary code. For example, [Webpack] 4+ or [Rollup] supports that,
+but Webpack 3 doesn't.
 
 ## License
 
@@ -119,14 +168,15 @@ MIT
 [rxjs]: https://github.com/ReactiveX/rxjs
 [npm]: https://www.npmjs.com/
 [yarn]: https://yarnpkg.com/
+[redux]: https://redux.js.org/
+[mobx]: https://mobx.js.org/
+[vuex]: https://vuex.vuejs.org/
 [observable]: http://reactivex.io/documentation/observable.html
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [webpack]: https://webpack.js.org
 [rollup]: https://rollupjs.org/
-
 [controller]: ./docs/reference/functions/controller.md
 [compose]: ./docs/reference/functions/compose.md
 [debug]: ./docs/reference/functions/debug.md
-
-[DefaultController]: ./docs/reference/classes/DefaultController.md
-[CompositeController]: ./docs/reference/classes/CompositeController.md
+[defaultcontroller]: ./docs/reference/classes/DefaultController.md
+[compositecontroller]: ./docs/reference/classes/CompositeController.md
