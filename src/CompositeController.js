@@ -3,7 +3,7 @@ import { filter, map } from 'rxjs/operators';
 
 import DefaultController from './DefaultController';
 
-const createChildren = (factories, initialState) => {
+const createChildren = (composite, factories, initialState, ...args) => {
   const childKeys = Object.keys(factories);
 
   const children = childKeys.reduce((props, key) => {
@@ -17,11 +17,17 @@ const createChildren = (factories, initialState) => {
 
     props[key] =
       typeof factory === 'function'
-        ? factory(initialState !== undefined ? initialState[key] : undefined)
-        : new CompositeController(
-          factory,
-          initialState !== undefined ? initialState[key] : undefined
-        );
+        ? factory(
+            initialState !== undefined ? initialState[key] : undefined,
+            ...args,
+            composite
+          )
+        : new SubCompositeController(
+            composite,
+            factory,
+            initialState !== undefined ? initialState[key] : undefined,
+            ...args
+          );
 
     return props;
   }, {});
@@ -29,13 +35,18 @@ const createChildren = (factories, initialState) => {
   return { childKeys, children };
 };
 
-export default class CompositeController {
-  constructor(factories, initialState) {
+class AbstractCompositeController {
+  constructor(createChildrenImpl, factories, initialState, ...args) {
     const controller = new DefaultController(
       initialState !== undefined ? initialState : {}
     );
 
-    const { childKeys, children } = createChildren(factories, initialState);
+    const { childKeys, children } = createChildrenImpl(
+      this,
+      factories,
+      initialState,
+      ...args
+    );
 
     if (initialState === undefined) {
       controller.set(
@@ -76,5 +87,22 @@ export default class CompositeController {
         },
       },
     });
+  }
+}
+
+export default class CompositeController extends AbstractCompositeController {
+  constructor(factories, initialState, ...args) {
+    super(createChildren, factories, initialState, ...args);
+  }
+}
+
+class SubCompositeController extends AbstractCompositeController {
+  constructor(parent, factories, initialState, ...args) {
+    super(
+      (composite, ...rest) => createChildren(parent, ...rest),
+      factories,
+      initialState,
+      ...args
+    );
   }
 }

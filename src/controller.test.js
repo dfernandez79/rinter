@@ -59,3 +59,28 @@ test('composition', t => {
   xy.y.twoTimes();
   t.deepEqual(xy.state, { x: 2, y: 3 });
 });
+
+test('methods are bound', t => {
+  const testCounter = counter();
+  const testCounterTwo = counter();
+  const twoTimes = testCounter.twoTimes;
+  const incrementOther = testCounterTwo.increment;
+
+  twoTimes();
+  incrementOther();
+
+  t.is(testCounter.state, 3);
+  t.is(testCounterTwo.state, 2);
+});
+
+test('constructor', t => {
+  const testController = controller({
+    constructor(initiState, value) {
+      this.initial = initiState;
+      this.value = value;
+    },
+  })(1, 42);
+
+  t.is(testController.initial, 1);
+  t.is(testController.value, 42);
+});

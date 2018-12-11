@@ -1,11 +1,22 @@
 import DefaultController from './DefaultController';
 
+function noop() {}
+
+function bindAll(obj, names) {
+  names.forEach(n => {
+    if (typeof obj[n] === 'function') {
+      obj[n] = obj[n].bind(obj);
+    }
+  });
+}
+
 export default function controller({
   initialState: defaultInitialState,
   mutators = {},
   methods = {},
+  constructor = noop,
 }) {
-  return function(initialState = defaultInitialState) {
+  return function(initialState = defaultInitialState, ...args) {
     const defaultController = new DefaultController(initialState);
 
     const initialDescriptors = {
@@ -35,6 +46,10 @@ export default function controller({
         return descriptors;
       }, initialDescriptors)
     );
+
+    bindAll(newController, Object.keys(methods));
+
+    constructor.call(newController, initialState, ...args);
 
     return newController;
   };

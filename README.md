@@ -45,19 +45,20 @@ In code:
 
 ```js
 const counter = controller({
+  initialState: {count: 0},
   mutators: {
     increase(state) {
-      return state + 1;
+      return {count: state.count + 1};
     },
     decrease(state) {
-      return state - 1;
+      return {count: state.count - 1};
     },
   },
 });
 
-const appCounter = counter(0);
+const appCounter = counter();
 
-appCounter.subscribe(state => {
+appCounter.changes.subscribe(state => {
   // renderView is an example of how the view will respond to state
   // changes and send callbacks to update the state
   renderView(state, {

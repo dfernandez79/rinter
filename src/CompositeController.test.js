@@ -9,6 +9,11 @@ const counter = controller({
       return { count: state.count + 1 };
     },
   },
+  constructor(initialState, a, b, parent) {
+    this.parent = parent;
+    this.argA = a;
+    this.argB = b;
+  },
 });
 
 test('create from factories and initial value', t => {
@@ -157,9 +162,6 @@ test('compose deep', t => {
     }
   );
 
-  t.true(composite.position instanceof CompositeController);
-  t.true(composite.size instanceof CompositeController);
-
   t.is(composite.state.position.x.count, 0);
   t.is(composite.state.position.y.count, 0);
   t.is(composite.state.size.width.count, 10);
@@ -179,4 +181,30 @@ test('throw error for changes child', t => {
   t.throws(() => {
     new CompositeController({ changes: counter }, { changes: { count: 0 } });
   }, 'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.');
+});
+
+test('pass the composite instance to the factory function', t => {
+  const composite = new CompositeController(
+    { counter },
+    undefined,
+    'test',
+    'arg'
+  );
+
+  t.is(composite.counter.parent, composite);
+  t.is(composite.counter.argA, 'test');
+  t.is(composite.counter.argB, 'arg');
+});
+
+test('pass the main composite instance to the sub-composite controllers', t => {
+  const composite = new CompositeController(
+    { another: { counter } },
+    undefined,
+    'test',
+    'arg'
+  );
+
+  t.is(composite.another.counter.parent, composite);
+  t.is(composite.another.counter.argA, 'test');
+  t.is(composite.another.counter.argB, 'arg');
 });

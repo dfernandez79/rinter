@@ -14,11 +14,16 @@ controller({
 
   // methods of the controller object
   methods: {
-    // you can use async/await
+    // the methods may be async
     async methodName() {
       this.functionName(); // you can use this to call any mutator
       this.anotherMethod(); // ... or method
     },
+  },
+
+  // optional method to configure the controller instance
+  constructor(initialState, ...args) {
+    // access to this is similar to a class constructor
   },
 });
 ```
@@ -42,6 +47,36 @@ console.log(aControllerInstance.state); // 42
 aControllerInstance.increment();
 console.log(aControllerInstance.state); // 43
 ```
+
+This method provides a convenient way of creating objects that comply with the
+[controller] interface. However, depending on your needs, you may consider
+alternative ways of creating a controller:
+
+- `controller` function:
+  - 👍 Good
+    - Mutators are the only way to change the state.
+    - It makes easy to migrate Redux code.
+    - Methods are bound by default, which is convenient for event handlers.
+  - 👎 Not good:
+    - You cannot use sub-classing to refactor code.
+    - You cannot use future JavaScript class features without re-writing.
+    - You need to be consistent about bound methods.
+- Sub-class [DefaultController]:
+  - 👍 Good
+    - Uses ES6 syntax which may play better with tooling, e.g IDE's type
+      inference.
+    - You can use decorators or other future JavaScript class features, e.g
+      private fields.
+    - Convenient if you want to refactor common behaviors into sub-classes.
+  - 👎 Not good:
+    - Exposes the `set` and `assign` methods.
+- Use [DefaultController]:
+  - 👍 Good
+    - All the benefits of sub-classing [DefaultController] without exposing the
+      `set` and `assign` methods.
+    - It makes easy to decorate the `changes` and `state` properties.
+  - 👎 Not good:
+    - Requires typing more code.
 
 ## Return value
 
