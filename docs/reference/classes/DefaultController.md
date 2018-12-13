@@ -3,7 +3,7 @@
 ## Constructor
 
 ```js
-new DefaultController(initialValue)
+DefaultController(initialValue)
 ```
 
 Creates a [controller] instance with the given initial state.

@@ -5,9 +5,9 @@ import { controller, compose } from '.';
 const counter = controller({
   initialState: { count: 0 },
 
-  constructor(initialState, argA, argB) {
-    this.argA = argA;
-    this.argB = argB;
+  initialize(options, parent) {
+    this.options = options;
+    this.parent = parent;
   },
 });
 
@@ -51,9 +51,10 @@ test('create with initial state', t => {
 
 test('create instance with additional arguments', t => {
   const factory = compose({ counter });
+  const opts = {};
+  const parent = {};
+  const composite = factory({ count: 1 }, opts, parent);
 
-  const composite = factory({ count: 1 }, 'test', 'arg');
-
-  t.is(composite.counter.argA, 'test');
-  t.is(composite.counter.argB, 'arg');
+  t.is(composite.counter.options, opts);
+  t.is(composite.counter.parent, parent);
 });

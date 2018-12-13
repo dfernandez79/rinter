@@ -14,9 +14,9 @@ export default function controller({
   initialState: defaultInitialState,
   mutators = {},
   methods = {},
-  constructor = noop,
+  initialize = noop,
 }) {
-  return function(initialState = defaultInitialState, ...args) {
+  return function(initialState = defaultInitialState, options = {}, parent) {
     const defaultController = new DefaultController(initialState);
 
     const initialDescriptors = {
@@ -48,8 +48,7 @@ export default function controller({
     );
 
     bindAll(newController, Object.keys(methods));
-
-    constructor.call(newController, initialState, ...args);
+    initialize.call(newController, options, parent);
 
     return newController;
   };

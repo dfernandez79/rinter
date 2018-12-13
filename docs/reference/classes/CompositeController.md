@@ -15,8 +15,8 @@ will return the state:
 
 ## Constructor
 
-```js
-new CompositeController(factories, [initialState])
+```typescript
+CompositeController(factories, initialState?, options?, parent?)
 ```
 
 The `factories` parameter specifies the shape of the composition and how to

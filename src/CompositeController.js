@@ -3,7 +3,7 @@ import { filter, map } from 'rxjs/operators';
 
 import DefaultController from './DefaultController';
 
-const createChildren = (composite, factories, initialState, ...args) => {
+function createChildren(factories, initialState, options, parent) {
   const childKeys = Object.keys(factories);
 
   const children = childKeys.reduce((props, key) => {
@@ -19,33 +19,33 @@ const createChildren = (composite, factories, initialState, ...args) => {
       typeof factory === 'function'
         ? factory(
             initialState !== undefined ? initialState[key] : undefined,
-            ...args,
-            composite
+            options,
+            parent
           )
-        : new SubCompositeController(
-            composite,
+        : new CompositeController(
             factory,
             initialState !== undefined ? initialState[key] : undefined,
-            ...args
+            options,
+            parent
           );
 
     return props;
   }, {});
 
   return { childKeys, children };
-};
+}
 
-class AbstractCompositeController {
-  constructor(createChildrenImpl, factories, initialState, ...args) {
+export default class CompositeController {
+  constructor(factories = {}, initialState, options = {}, parent) {
     const controller = new DefaultController(
       initialState !== undefined ? initialState : {}
     );
 
-    const { childKeys, children } = createChildrenImpl(
-      this,
+    const { childKeys, children } = createChildren(
       factories,
       initialState,
-      ...args
+      options,
+      parent === undefined ? this : parent
     );
 
     if (initialState === undefined) {
@@ -87,22 +87,5 @@ class AbstractCompositeController {
         },
       },
     });
-  }
-}
-
-export default class CompositeController extends AbstractCompositeController {
-  constructor(factories, initialState, ...args) {
-    super(createChildren, factories, initialState, ...args);
-  }
-}
-
-class SubCompositeController extends AbstractCompositeController {
-  constructor(parent, factories, initialState, ...args) {
-    super(
-      (composite, ...rest) => createChildren(parent, ...rest),
-      factories,
-      initialState,
-      ...args
-    );
   }
 }

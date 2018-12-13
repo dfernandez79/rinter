@@ -73,14 +73,17 @@ test('methods are bound', t => {
   t.is(testCounterTwo.state, 2);
 });
 
-test('constructor', t => {
-  const testController = controller({
-    constructor(initiState, value) {
-      this.initial = initiState;
-      this.value = value;
-    },
-  })(1, 42);
+test('initialize', t => {
+  const opts = {};
+  const parent = {};
 
-  t.is(testController.initial, 1);
-  t.is(testController.value, 42);
+  const testController = controller({
+    initialize(options, parent) {
+      this.options = options;
+      this.parent = parent;
+    },
+  })(undefined, opts, parent);
+
+  t.is(testController.options, opts);
+  t.is(testController.parent, parent);
 });

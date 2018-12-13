@@ -54,7 +54,7 @@ A controller factory function, that receives an initial state and returns a
 [controller] object:
 
 ```typescript
-(initialState: T) => Controller<T>
+(initialState: T, options: object, parent: Controller<any>) => Controller<T>
 ```
 
 ## See also

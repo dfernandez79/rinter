@@ -9,10 +9,9 @@ const counter = controller({
       return { count: state.count + 1 };
     },
   },
-  constructor(initialState, a, b, parent) {
+  initialize(options, parent) {
+    this.options = options;
     this.parent = parent;
-    this.argA = a;
-    this.argB = b;
   },
 });
 
@@ -184,27 +183,21 @@ test('throw error for changes child', t => {
 });
 
 test('pass the composite instance to the factory function', t => {
-  const composite = new CompositeController(
-    { counter },
-    undefined,
-    'test',
-    'arg'
-  );
+  const composite = new CompositeController({ counter }, undefined, {
+    test: 'options',
+  });
 
   t.is(composite.counter.parent, composite);
-  t.is(composite.counter.argA, 'test');
-  t.is(composite.counter.argB, 'arg');
+  t.deepEqual(composite.counter.options, { test: 'options' });
 });
 
 test('pass the main composite instance to the sub-composite controllers', t => {
   const composite = new CompositeController(
     { another: { counter } },
     undefined,
-    'test',
-    'arg'
+    { test: 'options' }
   );
 
   t.is(composite.another.counter.parent, composite);
-  t.is(composite.another.counter.argA, 'test');
-  t.is(composite.another.counter.argB, 'arg');
+  t.deepEqual(composite.another.counter.options, { test: 'options' });
 });
