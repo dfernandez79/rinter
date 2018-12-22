@@ -40,12 +40,6 @@ export default class DefaultController {
         },
       },
 
-      assign: {
-        value: newState => {
-          this.set(Object.assign({}, this.state, newState));
-        },
-      },
-
       notifyLastChangeOnly: {
         value(fn) {
           silent = true;

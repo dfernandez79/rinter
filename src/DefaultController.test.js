@@ -3,27 +3,27 @@ import test from 'ava';
 import { DefaultController } from '.';
 
 class Counter extends DefaultController {
-  constructor(initialValue = { count: 0 }) {
+  constructor(initialValue = 0) {
     super(initialValue);
   }
 
   increment() {
-    this.assign({ count: this.state.count + 1 });
+    this.set(this.state + 1);
   }
 }
 
 test('expose current state', t => {
-  const controller = new DefaultController({ count: 0 });
-  t.is(controller.state.count, 0);
+  const controller = new DefaultController(0);
+  t.is(controller.state, 0);
 });
 
 test('expose state changes', t => {
   t.plan(1);
-  const counter = new DefaultController({ count: 0 });
+  const counter = new DefaultController(0);
   counter.changes.subscribe(v => {
-    t.is(v.count, 1);
+    t.is(v, 1);
   });
-  counter.set({ count: 1 });
+  counter.set(1);
 });
 
 test('notify last change only', t => {
@@ -32,7 +32,7 @@ test('notify last change only', t => {
   const counter = new Counter();
 
   counter.changes.subscribe(v => {
-    t.is(v.count, 5);
+    t.is(v, 5);
   });
 
   counter.notifyLastChangeOnly(() => {
@@ -44,25 +44,9 @@ test('notify last change only', t => {
   });
 });
 
-test('assign uses Object.assign', t => {
-  const controller = new DefaultController({ count: 0 });
-  t.deepEqual(controller.state, {
-    count: 0,
-  });
-
-  controller.assign({ flag: true });
-
-  t.deepEqual(controller.state, {
-    count: 0,
-    flag: true,
-  });
-});
-
 test('set changes the state', t => {
-  const controller = new DefaultController({ count: 0 });
-  t.deepEqual(controller.state, {
-    count: 0,
-  });
+  const controller = new DefaultController(0);
+  t.is(controller.state, 0);
 
   controller.set({ flag: true });
 

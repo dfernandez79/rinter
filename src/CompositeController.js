@@ -35,8 +35,12 @@ function createChildren(factories, initialState, options, parent) {
   return { childKeys, children };
 }
 
+function defaultMergeChildState(state, childKeyValue) {
+  return Object.assign({}, state, childKeyValue);
+}
+
 export default class CompositeController {
-  constructor(factories = {}, initialState, options = {}, parent) {
+  constructor(factories = {}, initialState, options = {}, parent, mergeChildState = defaultMergeChildState) {
     const controller = new DefaultController(
       initialState !== undefined ? initialState : {}
     );
@@ -64,8 +68,6 @@ export default class CompositeController {
       )
     );
 
-    merge(...childObservers).subscribe(keyValue => controller.assign(keyValue));
-
     Object.defineProperties(
       this,
       childKeys.reduce((props, key) => {
@@ -87,5 +89,9 @@ export default class CompositeController {
         },
       },
     });
+
+    merge(...childObservers)
+      .pipe(map(keyValue => mergeChildState(this.state, keyValue)))
+      .subscribe(newState => controller.set(newState));
   }
 }

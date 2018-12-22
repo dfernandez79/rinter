@@ -24,34 +24,34 @@ Rinter is similar to [Redux], [MobX] or [Vuex]: it allows you to handle the
 application state in a centralized and predictable way.
 
 To get started we are going to follow the usual example of a number (aka
-"Counter"). Imagine an application that shows a number and two actions: increase
-and decrease.
+"Counter"). Imagine an application that shows a number and two actions:
+increment and decrement.
 
-<img src="./docs/images/introduction-diagram-1.png" alt="Application displaying a number and two buttons: plus and minus" width="225">
+<img src="./docs/images/introduction-diagram-1.png" alt="Application displaying a number and two buttons: plus and minus" width="301">
 
 An immutable object describes the application state. And the actions generates a
 new instance of the application state:
 
-<img src="./docs/images/introduction-diagram-2.png" alt="Diagram displaying an action called increase that creates a new state" width="383">
+<img src="./docs/images/introduction-diagram-2.png" alt="Diagram displaying an action called increment that creates a new state" width="511">
 
 Rinter represents this architecture with an object called [Controller]. A
 controller has a `state` property that returns the current state value. It also
 has methods to modify the state. The view is able to detect changes by the
 `changes` property.
 
-<img src="./docs/images/introduction-diagram-3.png" alt="Diagram of the Rinter architecture" width="510">
+<img src="./docs/images/introduction-diagram-3.png" alt="Diagram of the Rinter architecture" width="681">
 
-In code:
+Code:
 
 ```js
 const counter = controller({
-  initialState: {count: 0},
+  initialState: { count: 0 },
   mutators: {
-    increase(state) {
-      return {count: state.count + 1};
+    increment(state) {
+      return { count: state.count + 1 };
     },
-    decrease(state) {
-      return {count: state.count - 1};
+    decrement(state) {
+      return { count: state.count - 1 };
     },
   },
 });
@@ -62,8 +62,8 @@ appCounter.changes.subscribe(state => {
   // renderView is an example of how the view will respond to state
   // changes and send callbacks to update the state
   renderView(state, {
-    onIncreaseClick: appCounter.increase,
-    onDecreaseClick: appCounter.decrease,
+    onIncrementClick: appCounter.increment,
+    onDecrementClick: appCounter.decrement,
   });
 });
 ```

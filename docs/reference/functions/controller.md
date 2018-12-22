@@ -4,7 +4,7 @@
 controller({
   initialState: undefined, // default initial state
 
-  // functions that modify state, they controller object will have
+  // functions that modify state, the controller object will have
   // methods with the signature functionName(...args):
   mutators: {
     functionName(state, ...args) {
