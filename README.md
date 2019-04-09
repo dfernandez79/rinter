@@ -20,8 +20,8 @@ yarn add rinter rxjs
 
 ## Getting started
 
-Rinter is similar to [Redux], [MobX] or [Vuex]: it allows you to handle the
-application state in a centralized and predictable way.
+Rinter is similar to [Redux], [MobX] or [Vuex]: it handles the application state
+in a centralized and predictable way.
 
 To get started we are going to follow the usual example of a number (aka
 "Counter"). Imagine an application that shows a number and two actions:
