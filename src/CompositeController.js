@@ -40,7 +40,13 @@ function defaultMergeChildState(state, childKeyValue) {
 }
 
 export default class CompositeController {
-  constructor(factories = {}, initialState, options = {}, parent, mergeChildState = defaultMergeChildState) {
+  constructor(
+    factories = {},
+    initialState,
+    options = {},
+    parent,
+    mergeChildState = defaultMergeChildState
+  ) {
     const controller = new DefaultController(
       initialState !== undefined ? initialState : {}
     );
