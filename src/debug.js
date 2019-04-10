@@ -1,4 +1,4 @@
-import { share } from 'rxjs/operators';
+import share from './share';
 
 const SILENT = {
   stateChange() {},
@@ -15,14 +15,8 @@ const VERBOSE = {
 function debug(controller, options = VERBOSE) {
   const opts = Object.assign({}, SILENT, options);
 
-  const changes = controller.changes.pipe(share());
-  changes.subscribe(opts.stateChange);
-
-  const newController = Object.create(controller, {
-    changes: {
-      value: changes,
-    },
-  });
+  const newController = share(controller);
+  newController.changes.subscribe(opts.stateChange);
 
   return newController;
 }

@@ -74,6 +74,7 @@ appCounter.changes.subscribe(state => {
 
 - [controller]
 - [compose]
+- [share]
 - [debug]
 
 ### Classes
@@ -143,15 +144,14 @@ const otherSubscription = controller.changes.subscribe(
 ```
 
 That behavior is by design. On a front-end app, you usually have only one
-subscriber: the view. If you need to broadcast changes use the [RxJS]'s
-`share()` operator:
+subscriber: the view. If you need to broadcast changes use the [share] function:
 
 ```js
-import { share } from 'rxjs/operators';
+import { share } from 'rinter';
 
-const changes = controller.changes.pipe(share());
+const sharedController = share(controller);
 
-// now you can subscribe to changes multiple times
+// now you can subscribe to sharedController.changes multiple times
 ```
 
 ### Big bundle size
@@ -178,6 +178,7 @@ MIT
 [rollup]: https://rollupjs.org/
 [controller]: ./docs/reference/functions/controller.md
 [compose]: ./docs/reference/functions/compose.md
+[share]: ./docs/reference/functions/share.md
 [debug]: ./docs/reference/functions/debug.md
 [defaultcontroller]: ./docs/reference/classes/DefaultController.md
 [compositecontroller]: ./docs/reference/classes/CompositeController.md
