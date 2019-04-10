@@ -34,11 +34,11 @@
     "rxjs": "^6.3.3"
   },
   "scripts": {
-    "build": "npm-run-all build:node build:esm",
-    "build:node": "babel src -d lib",
+    "build": "npm-run-all build:lib build:esm",
+    "build:lib": "babel src -d lib",
     "build:esm": "cpy '**/*.js' '!**/*.test.js' --cwd=src ../lib-esm",
     "test": "ava",
-    "coverage": "npm-run-all build:node coverage:run",
+    "coverage": "npm-run-all build:lib coverage:run",
     "coverage:run": "nyc --reporter=html ava",
     "clean": "rimraf lib lib-esm *.tgz coverage .nyc_output *.log",
     "lint": "eslint src",
