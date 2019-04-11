@@ -4,16 +4,6 @@ Rinter it's a minimalist state container based on [reactive extensions].
 
 ## Installation
 
-Rinter requires [RxJS] as peer-dependency.
-
-To install it using [NPM]:
-
-```shell
-npm install --save rinter rxjs
-```
-
-To install it using [Yarn]:
-
 ```shell
 yarn add rinter rxjs
 ```
@@ -34,25 +24,22 @@ new instance of the application state:
 
 <img src="./docs/images/introduction-diagram-2.png" alt="Diagram displaying an action called increment that creates a new state" width="511">
 
-Rinter represents this architecture with an object called [Controller]. A
-controller has a `state` property that returns the current state value. It also
-has methods to modify the state. The view is able to detect changes by the
-`changes` property.
+Rinter represents this architecture with an object called
+[Controller][controller interface]. A controller has a `state` property that
+returns the current state value. It also has methods to modify the state. The
+view is able to detect changes by the `changes` property.
 
 <img src="./docs/images/introduction-diagram-3.png" alt="Diagram of the Rinter architecture" width="681">
 
-Code:
+Code (using the [controller] function):
 
 ```js
 const counter = controller({
   initialState: { count: 0 },
+
   mutators: {
-    increment(state) {
-      return { count: state.count + 1 };
-    },
-    decrement(state) {
-      return { count: state.count - 1 };
-    },
+    increment: state => ({ count: state.count + 1 }),
+    decrement: state => ({ count: state.count - 1 }),
   },
 });
 
@@ -68,14 +55,43 @@ appCounter.changes.subscribe(state => {
 });
 ```
 
+The [controller] function is a shortcut to write less code. If you prefer ES6
+classes you can create a [Controller][controller interface] by sub-classing
+[DefaultController]:
+
+```js
+class Counter extends DefaultController {
+  constructor(initialValue = { count: 0 }) {
+    super(initialValue);
+  }
+
+  increment() {
+    this.set({ count: this.state.count + 1 });
+  }
+
+  decrement() {
+    this.set({ count: this.state.count - 1 });
+  }
+}
+
+const appCounter = counter();
+
+appCounter.changes.subscribe(state => {
+  renderView(state, {
+    onIncrementClick: () => appCounter.increment(),
+    onDecrementClick: () => appCounter.decrement(),
+  });
+});
+```
+
 ## API reference
 
 ### Functions
 
 - [controller]
 - [compose]
-- [share]
 - [debug]
+- [share]
 
 ### Classes
 
@@ -97,14 +113,13 @@ const changes = controller.changes.pipe(tap(v => console.log(v)));
 // subscribe to changes instead of controller.changes
 ```
 
-However, setting up this in an app that passes references to the controller
-instead to the observer can be annoying. The good news is that you can use the
-[debug] utility function to create a proxy to trace state changes:
+However, setting up this in an app can be annoying. The good news is that you can use the
+[debug] utility function to trace state changes:
 
 ```js
 import { debug } from 'rinter';
 
-const controller = debug(new MyApp(), {
+const controller = debug(initialController, {
   stateChange(value) {
     console.log(value);
   },
@@ -117,7 +132,7 @@ it without having to configure all the options:
 ```js
 import { debug } from 'rinter';
 
-const controller = debug(new MyApp(), debug.SILENT);
+const controller = debug(initialController, debug.SILENT);
 ```
 
 ### Multiple subscribers
@@ -167,8 +182,6 @@ MIT
 
 [reactive extensions]: https://github.com/ReactiveX/rxjs
 [rxjs]: https://github.com/ReactiveX/rxjs
-[npm]: https://www.npmjs.com/
-[yarn]: https://yarnpkg.com/
 [redux]: https://redux.js.org/
 [mobx]: https://mobx.js.org/
 [vuex]: https://vuex.vuejs.org/
@@ -176,7 +189,9 @@ MIT
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [webpack]: https://webpack.js.org
 [rollup]: https://rollupjs.org/
+
 [controller]: ./docs/reference/functions/controller.md
+[controller interface]: ./docs/reference/interface/controller.md
 [compose]: ./docs/reference/functions/compose.md
 [share]: ./docs/reference/functions/share.md
 [debug]: ./docs/reference/functions/debug.md
