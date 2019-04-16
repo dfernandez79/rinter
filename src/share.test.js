@@ -1,8 +1,7 @@
-import test from 'ava';
 import { controller, share } from '.';
 
-test('convert a controller changes to a shared observable', t => {
-  t.plan(2);
+test('convert a controller changes to a shared observable', () => {
+  expect.assertions(2);
 
   const createController = controller({
     initialState: 0,
@@ -12,8 +11,8 @@ test('convert a controller changes to a shared observable', t => {
   });
   const testController = share(createController());
 
-  testController.changes.subscribe(() => t.pass());
-  testController.changes.subscribe(() => t.pass());
+  testController.changes.subscribe(state => expect(state).toBe(1));
+  testController.changes.subscribe(state => expect(state).toBe(1));
 
   testController.increment();
 });

@@ -1,5 +1,3 @@
-import test from 'ava';
-
 import { controller, CompositeController } from '.';
 
 const counter = controller({
@@ -15,7 +13,7 @@ const counter = controller({
   },
 });
 
-test('create from factories and initial value', t => {
+test('create from factories and initial value', () => {
   const initialState = { a: { count: 1 }, b: { count: 1 } };
 
   const composite = new CompositeController(
@@ -26,10 +24,10 @@ test('create from factories and initial value', t => {
     initialState
   );
 
-  t.is(composite.state, initialState);
+  expect(composite.state).toBe(initialState);
 });
 
-test('accessors for child controllers', t => {
+test('accessors for child controllers', () => {
   const composite = new CompositeController(
     {
       a: counter,
@@ -38,17 +36,17 @@ test('accessors for child controllers', t => {
     {}
   );
 
-  t.true('state' in composite.a);
-  t.true('changes' in composite.a);
-  t.true('notifyLastChangeOnly' in composite.a);
-  t.true('increment' in composite.a);
-  t.true('state' in composite.b);
-  t.true('changes' in composite.b);
-  t.true('notifyLastChangeOnly' in composite.b);
-  t.true('increment' in composite.b);
+  expect('state' in composite.a).toBe(true);
+  expect('changes' in composite.a).toBe(true);
+  expect('notifyLastChangeOnly' in composite.a).toBe(true);
+  expect('increment' in composite.a).toBe(true);
+  expect('state' in composite.b).toBe(true);
+  expect('changes' in composite.b).toBe(true);
+  expect('notifyLastChangeOnly' in composite.b).toBe(true);
+  expect('increment' in composite.b).toBe(true);
 });
 
-test('readonly accessors for child controllers', t => {
+test('readonly accessors for child controllers', () => {
   const composite = new CompositeController(
     {
       a: counter,
@@ -58,12 +56,12 @@ test('readonly accessors for child controllers', t => {
 
   const descriptor = Object.getOwnPropertyDescriptor(composite, 'a');
 
-  t.false(descriptor.writable);
-  t.false(descriptor.configurable);
-  t.true(descriptor.enumerable);
+  expect(descriptor.writable).toBe(false);
+  expect(descriptor.configurable).toBe(false);
+  expect(descriptor.enumerable).toBe(true);
 });
 
-test('child accessors are enumerable', t => {
+test('child accessors are enumerable', () => {
   const composite = new CompositeController(
     {
       a: counter,
@@ -74,13 +72,13 @@ test('child accessors are enumerable', t => {
 
   const keys = Object.keys(composite);
 
-  t.is(keys.length, 2);
-  t.is(keys[0], 'a');
-  t.is(keys[1], 'b');
+  expect(keys.length).toBe(2);
+  expect(keys[0]).toBe('a');
+  expect(keys[1]).toBe('b');
 });
 
-test('report changes from children', t => {
-  t.plan(2);
+test('report changes from children', () => {
+  expect.assertions(2);
 
   const composite = new CompositeController(
     {
@@ -94,15 +92,15 @@ test('report changes from children', t => {
   );
 
   composite.changes.subscribe(state => {
-    t.is(state.a.count, 2);
-    t.is(state.b.count, 1);
+    expect(state.a.count).toBe(2);
+    expect(state.b.count).toBe(1);
   });
 
   composite.a.increment();
 });
 
-test('do not notify initial state', t => {
-  t.plan(0);
+test('do not notify initial state', () => {
+  const changesCallback = jest.fn();
 
   const initial = { a: 1, b: 2 };
   const composite = new CompositeController(
@@ -113,11 +111,12 @@ test('do not notify initial state', t => {
     initial
   );
 
-  composite.changes.subscribe(() => t.fail());
+  composite.changes.subscribe(changesCallback);
+  expect(changesCallback).not.toHaveBeenCalled();
 });
 
-test('notify last change only', t => {
-  t.plan(2);
+test('notify last change only', () => {
+  expect.assertions(2);
 
   const composite = new CompositeController(
     {
@@ -131,8 +130,8 @@ test('notify last change only', t => {
   );
 
   composite.changes.subscribe(state => {
-    t.is(state.a.count, 5);
-    t.is(state.b.count, 6);
+    expect(state.a.count).toBe(5);
+    expect(state.b.count).toBe(6);
   });
 
   composite.notifyLastChangeOnly(() => {
@@ -149,7 +148,7 @@ test('notify last change only', t => {
   });
 });
 
-test('compose deep', t => {
+test('compose deep', () => {
   const composite = new CompositeController(
     {
       position: { x: counter, y: counter },
@@ -161,43 +160,47 @@ test('compose deep', t => {
     }
   );
 
-  t.is(composite.state.position.x.count, 0);
-  t.is(composite.state.position.y.count, 0);
-  t.is(composite.state.size.width.count, 10);
-  t.is(composite.state.size.height.count, 10);
+  expect(composite.state.position.x.count).toBe(0);
+  expect(composite.state.position.y.count).toBe(0);
+  expect(composite.state.size.width.count).toBe(10);
+  expect(composite.state.size.height.count).toBe(10);
 
   composite.position.x.increment();
-  t.is(composite.state.position.x.count, 1);
+  expect(composite.state.position.x.count).toBe(1);
 });
 
-test('throw error for state child', t => {
-  t.throws(() => {
+test('throw error for state child', () => {
+  expect(() => {
     new CompositeController({ state: counter }, { state: { count: 0 } });
-  }, 'Cannot create the child controller "state". The name clashes with the state property, use another name for the controller.');
+  }).toThrowError(
+    'Cannot create the child controller "state". The name clashes with the state property, use another name for the controller.'
+  );
 });
 
-test('throw error for changes child', t => {
-  t.throws(() => {
+test('throw error for changes child', () => {
+  expect(() => {
     new CompositeController({ changes: counter }, { changes: { count: 0 } });
-  }, 'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.');
+  }).toThrowError(
+    'Cannot create the child controller "changes". The name clashes with the changes property, use another name for the controller.'
+  );
 });
 
-test('pass the composite instance to the factory function', t => {
+test('pass the composite instance to the factory function', () => {
   const composite = new CompositeController({ counter }, undefined, {
     test: 'options',
   });
 
-  t.is(composite.counter.parent, composite);
-  t.deepEqual(composite.counter.options, { test: 'options' });
+  expect(composite.counter.parent).toBe(composite);
+  expect(composite.counter.options).toEqual({ test: 'options' });
 });
 
-test('pass the main composite instance to the sub-composite controllers', t => {
+test('pass the main composite instance to the sub-composite controllers', () => {
   const composite = new CompositeController(
     { another: { counter } },
     undefined,
     { test: 'options' }
   );
 
-  t.is(composite.another.counter.parent, composite);
-  t.deepEqual(composite.another.counter.options, { test: 'options' });
+  expect(composite.another.counter.parent).toBe(composite);
+  expect(composite.another.counter.options).toEqual({ test: 'options' });
 });

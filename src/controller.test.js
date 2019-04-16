@@ -1,4 +1,3 @@
-import test from 'ava';
 import { compose, controller } from '.';
 
 const counter = controller({
@@ -16,28 +15,28 @@ const counter = controller({
   },
 });
 
-test('initial state', t => {
+test('initial state', () => {
   const testCounter = counter();
 
-  t.is(testCounter.state, 1);
+  expect(testCounter.state).toBe(1);
 });
 
-test('state changes', t => {
-  t.plan(1);
+test('state changes', () => {
+  expect.assertions(1);
   const testCounter = counter();
   testCounter.changes.subscribe(v => {
-    t.is(v, 2);
+    expect(v).toBe(2);
   });
   testCounter.increment();
 });
 
-test('notify last change only', t => {
-  t.plan(1);
+test('notify last change only', () => {
+  expect.assertions(1);
 
   const testCounter = counter(0);
 
   testCounter.changes.subscribe(v => {
-    t.is(v, 5);
+    expect(v).toBe(5);
   });
 
   testCounter.notifyLastChangeOnly(() => {
@@ -47,20 +46,20 @@ test('notify last change only', t => {
   });
 });
 
-test('composition', t => {
+test('composition', () => {
   const xy = compose({
     x: counter,
     y: counter,
   })();
 
-  t.deepEqual(xy.state, { x: 1, y: 1 });
+  expect(xy.state).toEqual({ x: 1, y: 1 });
   xy.x.increment();
-  t.deepEqual(xy.state, { x: 2, y: 1 });
+  expect(xy.state).toEqual({ x: 2, y: 1 });
   xy.y.twoTimes();
-  t.deepEqual(xy.state, { x: 2, y: 3 });
+  expect(xy.state).toEqual({ x: 2, y: 3 });
 });
 
-test('methods are bound', t => {
+test('methods are bound', () => {
   const testCounter = counter();
   const testCounterTwo = counter();
   const twoTimes = testCounter.twoTimes;
@@ -69,11 +68,11 @@ test('methods are bound', t => {
   twoTimes();
   incrementOther();
 
-  t.is(testCounter.state, 3);
-  t.is(testCounterTwo.state, 2);
+  expect(testCounter.state).toBe(3);
+  expect(testCounterTwo.state).toBe(2);
 });
 
-test('initialize', t => {
+test('initialize', () => {
   const opts = {};
   const parent = {};
 
@@ -84,6 +83,6 @@ test('initialize', t => {
     },
   })(undefined, opts, parent);
 
-  t.is(testController.options, opts);
-  t.is(testController.parent, parent);
+  expect(testController.options).toBe(opts);
+  expect(testController.parent).toBe(parent);
 });

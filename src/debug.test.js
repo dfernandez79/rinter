@@ -1,8 +1,6 @@
-import test from 'ava';
-
 import { debug, controller, CompositeController, DefaultController } from '.';
 
-test('trace state changes from DefaultController', t => {
+test('trace state changes from DefaultController', () => {
   const buff = [];
 
   const testController = debug(new DefaultController({ value: 1 }), {
@@ -14,10 +12,10 @@ test('trace state changes from DefaultController', t => {
   testController.set({ value: 2 });
   testController.set({ value: 3 });
 
-  t.deepEqual(buff, [{ value: 2 }, { value: 3 }]);
+  expect(buff).toEqual([{ value: 2 }, { value: 3 }]);
 });
 
-test('trace state changes from CompositeController', t => {
+test('trace state changes from CompositeController', () => {
   const buff = [];
 
   const testController = debug(
@@ -35,10 +33,10 @@ test('trace state changes from CompositeController', t => {
   testController.first.set({ value: 2 });
   testController.first.set({ value: 3 });
 
-  t.deepEqual(buff, [{ first: { value: 2 } }, { first: { value: 3 } }]);
+  expect(buff).toEqual([{ first: { value: 2 } }, { first: { value: 3 } }]);
 });
 
-test('trace state changes from controller', t => {
+test('trace state changes from controller', () => {
   const buff = [];
 
   const targetController = controller({
@@ -59,5 +57,5 @@ test('trace state changes from controller', t => {
   testController.set({ value: 2 });
   testController.set({ value: 3 });
 
-  t.deepEqual(buff, [{ value: 2 }, { value: 3 }]);
+  expect(buff).toEqual([{ value: 2 }, { value: 3 }]);
 });

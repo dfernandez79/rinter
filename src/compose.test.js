@@ -1,5 +1,3 @@
-import test from 'ava';
-
 import { controller, compose } from '.';
 
 const counter = controller({
@@ -11,7 +9,7 @@ const counter = controller({
   },
 });
 
-test('create with default initial state', t => {
+test('create with default initial state', () => {
   const initialState = { a: { count: 1 }, b: { count: 1 } };
 
   const compositeFactory = compose(
@@ -24,10 +22,10 @@ test('create with default initial state', t => {
 
   const composite = compositeFactory();
 
-  t.is(composite.state, initialState);
+  expect(composite.state).toBe(initialState);
 });
 
-test('create without initial state', t => {
+test('create without initial state', () => {
   const compositeFactory = compose({
     a: counter,
     b: counter,
@@ -35,10 +33,10 @@ test('create without initial state', t => {
 
   const composite = compositeFactory();
 
-  t.deepEqual(composite.state, { a: { count: 0 }, b: { count: 0 } });
+  expect(composite.state).toEqual({ a: { count: 0 }, b: { count: 0 } });
 });
 
-test('create with initial state', t => {
+test('create with initial state', () => {
   const compositeFactory = compose({
     a: counter,
     b: counter,
@@ -46,15 +44,15 @@ test('create with initial state', t => {
 
   const composite = compositeFactory({ a: { count: 1 }, b: { count: 2 } });
 
-  t.deepEqual(composite.state, { a: { count: 1 }, b: { count: 2 } });
+  expect(composite.state).toEqual({ a: { count: 1 }, b: { count: 2 } });
 });
 
-test('create instance with additional arguments', t => {
+test('create instance with additional arguments', () => {
   const factory = compose({ counter });
   const opts = {};
   const parent = {};
   const composite = factory({ count: 1 }, opts, parent);
 
-  t.is(composite.counter.options, opts);
-  t.is(composite.counter.parent, parent);
+  expect(composite.counter.options).toBe(opts);
+  expect(composite.counter.parent).toBe(parent);
 });

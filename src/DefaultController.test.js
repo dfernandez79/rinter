@@ -1,5 +1,3 @@
-import test from 'ava';
-
 import { DefaultController } from '.';
 
 class Counter extends DefaultController {
@@ -12,27 +10,27 @@ class Counter extends DefaultController {
   }
 }
 
-test('expose current state', t => {
+test('expose current state', () => {
   const controller = new DefaultController(0);
-  t.is(controller.state, 0);
+  expect(controller.state).toBe(0);
 });
 
-test('expose state changes', t => {
-  t.plan(1);
+test('expose state changes', () => {
+  expect.assertions(1);
   const counter = new DefaultController(0);
   counter.changes.subscribe(v => {
-    t.is(v, 1);
+    expect(v).toBe(1);
   });
   counter.set(1);
 });
 
-test('notify last change only', t => {
-  t.plan(1);
+test('notify last change only', () => {
+  expect.assertions(1);
 
   const counter = new Counter();
 
   counter.changes.subscribe(v => {
-    t.is(v, 5);
+    expect(v).toBe(5);
   });
 
   counter.notifyLastChangeOnly(() => {
@@ -44,53 +42,48 @@ test('notify last change only', t => {
   });
 });
 
-test('set changes the state', t => {
+test('set changes the state', () => {
   const controller = new DefaultController(0);
-  t.is(controller.state, 0);
+  expect(controller.state).toBe(0);
 
   controller.set({ flag: true });
 
-  t.deepEqual(controller.state, {
+  expect(controller.state).toEqual({
     flag: true,
   });
 });
 
-test('supports only one subscription', t => {
-  t.plan(2);
+test('supports only one subscription', () => {
   const counter = new Counter();
+  const changesCallback = jest.fn();
+  const errorCallback = jest.fn();
 
-  counter.changes.subscribe(() => {
-    t.pass();
-  });
-
-  counter.changes.subscribe(
-    () => {
-      t.fail();
-    },
-    () => {
-      t.pass();
-    }
-  );
+  counter.changes.subscribe(state => expect(state).toBe(1));
+  counter.changes.subscribe(changesCallback, errorCallback);
 
   counter.increment();
+
+  expect(changesCallback).not.toHaveBeenCalled();
+  expect(errorCallback).toHaveBeenCalled();
 });
 
-test('updates without subscription do not throw', t => {
+test('updates without subscription do not throw', () => {
   const counter = new Counter();
 
-  t.notThrows(() => counter.increment());
-  t.notThrows(() => {
+  expect(() => counter.increment()).not.toThrow();
+  expect(() => {
     counter.notifyLastChangeOnly(() => {
       counter.increment();
       counter.increment();
     });
-  });
+  }).not.toThrow();
 });
 
-test('Remove subscription', t => {
+test('Remove subscription', () => {
   const counter = new Counter();
-  const subscription = counter.changes.subscribe(() => t.fail());
+  const changesCallback = jest.fn();
+  const subscription = counter.changes.subscribe(changesCallback);
   subscription.unsubscribe();
   counter.increment();
-  t.pass();
+  expect(changesCallback).not.toHaveBeenCalled();
 });

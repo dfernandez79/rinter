@@ -23,39 +23,23 @@
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
-    "@babel/register": "^7.0.0",
-    "ava": "^1.2.1",
-    "cpy-cli": "^2.0.0",
     "eslint": "^5.9.0",
+    "eslint-plugin-jest": "^22.4.1",
+    "jest": "^24.7.1",
     "np": "^4.0.2",
     "npm-run-all": "^4.1.3",
-    "nyc": "^13.1.0",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3"
   },
   "scripts": {
     "build": "npm-run-all build:lib build:esm",
-    "build:lib": "babel src -d lib",
-    "build:esm": "cpy '**/*.js' '!**/*.test.js' --cwd=src ../lib-esm",
-    "test": "ava",
-    "coverage": "npm-run-all build:lib coverage:run",
-    "coverage:run": "nyc --reporter=html ava",
-    "clean": "rimraf lib lib-esm *.tgz coverage .nyc_output *.log",
+    "build:lib": "babel src -d lib --env-name lib",
+    "build:esm": "babel src -d lib-esm --env-name esm",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "clean": "rimraf lib lib-esm *.tgz coverage *.log",
     "lint": "eslint src",
     "release": "npm-run-all clean lint build release:np",
     "release:np": "np"
-  },
-  "ava": {
-    "files": [
-      "src/**/*.test.js"
-    ],
-    "require": [
-      "@babel/register"
-    ],
-    "babel": {
-      "testOptions": {
-        "babelrc": false
-      }
-    }
   }
 }
