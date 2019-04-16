@@ -16,7 +16,11 @@ export default function controller({
   methods = {},
   initialize = noop,
 }) {
-  return function(initialState = defaultInitialState, options = {}, parent) {
+  function controllerFactory(
+    initialState = defaultInitialState,
+    options = {},
+    parent
+  ) {
     const defaultController = new DefaultController(initialState);
 
     const initialDescriptors = {
@@ -51,5 +55,7 @@ export default function controller({
     initialize.call(newController, options, parent);
 
     return newController;
-  };
+  }
+  controllerFactory.DEFAULT_INITIAL_STATE = defaultInitialState;
+  return controllerFactory;
 }

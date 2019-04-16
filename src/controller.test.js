@@ -86,3 +86,15 @@ test('initialize', () => {
   expect(testController.options).toBe(opts);
   expect(testController.parent).toBe(parent);
 });
+
+test('define DEFAULT_INITIAL_STATE', () => {
+  const testController = controller({
+    initialState: {
+      test: 'This is a default state',
+    },
+  });
+
+  expect(testController.DEFAULT_INITIAL_STATE).toEqual({
+    test: 'This is a default state',
+  });
+});
