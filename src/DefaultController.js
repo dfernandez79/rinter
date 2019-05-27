@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
 
 export default class DefaultController {
   constructor(initialState) {
@@ -9,7 +10,7 @@ export default class DefaultController {
     const changes = Observable.create(obs => {
       if (observer !== undefined) {
         throw new Error(
-          'This controller changes only supports one subscription at a time. Use share() to multicast changes, or unsubscribe the current subscription.'
+          'Unexpected state: DefaultController internally handles only one observer at a time. Report this bug to https://git.io/fjRmP'
         );
       }
 
@@ -18,7 +19,7 @@ export default class DefaultController {
       return () => {
         observer = undefined;
       };
-    });
+    }).pipe(share());
 
     Object.defineProperties(this, {
       state: {

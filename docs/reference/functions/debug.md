@@ -16,6 +16,7 @@ Debug it's a utility function that helps to trace state changes.
 
 ## Return value
 
-It returns a new [controller] instance that decorates the given `controller`.
+It returns [controller] but subscribes an `Observer` to the changes [Observable].
 
 [controller]: ../interface/Controller.md
+[observable]: http://reactivex.io/documentation/observable.html

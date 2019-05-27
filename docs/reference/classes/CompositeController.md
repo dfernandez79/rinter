@@ -46,7 +46,7 @@ composite.controllerB; // returns a DefaultController instance
 ## Properties
 
 - `state`: Read only. The current state value.
-- `changes`: Read only. A hot [Observable] that emits the state each time it
+- `changes`: Read only. An [Observable] that emits the state each time it
   changes.
 
 ## Methods

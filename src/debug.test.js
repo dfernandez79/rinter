@@ -106,3 +106,25 @@ test('SILENT never uses console', () => {
     global.console = previousConsole;
   }
 });
+
+test('trace state changes from factory', () => {
+  const buff = [];
+
+  const testControllerFactory = controller({
+    initialState: 0,
+    mutators: {
+      increment: n => n + 1,
+    },
+  });
+
+  const testController = debug(testControllerFactory, {
+    stateChange(value) {
+      buff.push(value);
+    },
+  })();
+
+  testController.increment();
+  testController.increment();
+
+  expect(buff).toEqual([1, 2]);
+});

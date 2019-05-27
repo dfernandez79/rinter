@@ -3,7 +3,7 @@
 ## Constructor
 
 ```js
-DefaultController(initialValue)
+DefaultController(initialValue);
 ```
 
 Creates a [controller] instance with the given initial state.
@@ -11,7 +11,7 @@ Creates a [controller] instance with the given initial state.
 ## Properties
 
 - `state`: Read only. The current state value.
-- `changes`: Read only. A hot [Observable] that emits the state each time it
+- `changes`: Read only. An [Observable] that emits the state each time it
   changes.
 
 ## Methods

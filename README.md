@@ -1,6 +1,6 @@
 # Rinter
 
-Rinter it's a minimalist state container based on [reactive extensions].
+Rinter is a minimalist state container based on [reactive extensions].
 
 ## Installation
 
@@ -8,21 +8,20 @@ Rinter it's a minimalist state container based on [reactive extensions].
 yarn add rinter rxjs
 ```
 
-## Getting started
+## Getting Started
 
 Rinter is similar to [Redux], [MobX] or [Vuex]: it handles the application state
 in a centralized and predictable way.
 
-To get started we are going to follow the usual example of a number (aka
-"Counter"). Imagine an application that shows a number and two actions:
-increment and decrement.
+To get started we are going to follow the usual example of incrementing or
+decrementing a number (aka "Counter").
 
 <img src="./docs/images/introduction-diagram-1.png" alt="Application displaying a number and two buttons: plus and minus" width="301">
 
-An immutable object describes the application state. And the actions generates a
+An immutable object describes the application state. And the actions generate a
 new instance of the application state:
 
-<img src="./docs/images/introduction-diagram-2.png" alt="Diagram displaying an action called increment that creates a new state" width="511">
+<img src="./docs/images/introduction-diagram-2.png" alt="A diagram displaying an action called increment that creates a new state" width="511">
 
 Rinter represents this architecture with an object called
 [Controller][controller interface]. A controller has a `state` property that
@@ -84,14 +83,31 @@ appCounter.changes.subscribe(state => {
 });
 ```
 
-## API reference
+## Controller Composition
+
+As your application grows, you may want to compose multiple controllers into
+one. The [compose] function does that:
+
+```js
+const twoCounters = compose({
+  a: counter,
+  b: counter,
+});
+
+const controller = twoCounters();
+console.log(controller.state); // {a: {count: 0}, b: {count:0}}
+
+controller.a.increment();
+console.log(controller.state); // {a: {count: 1}, b: {count:0}}
+```
+
+## API Reference
 
 ### Functions
 
 - [controller]
 - [compose]
 - [debug]
-- [share]
 
 ### Classes
 
@@ -100,76 +116,64 @@ appCounter.changes.subscribe(state => {
 
 ## Troubleshooting
 
-### Log state changes
+### Log State Changes
 
 The [Observable] returned by the `changes` property can be used to trace state
 changes:
 
 ```js
-import { tap } from 'rxjs/operators';
-
-// ...
-const changes = controller.changes.pipe(tap(v => console.log(v)));
-// subscribe to changes instead of controller.changes
+controller.changes.subscribe(state => console.log(state));
 ```
 
-However, setting up this in an app can be annoying. The good news is that you can use the
-[debug] utility function to trace state changes:
+However, setting up this in an app can be annoying. The good news is that you
+can use the [debug] utility function to trace state changes:
 
 ```js
 import { debug } from 'rinter';
+//...
+debug(controller);
+```
 
-const controller = debug(initialController, {
+By default, [debug] will log every state change, but you can mute it:
+
+```js
+debug(controller, debug.SILENT);
+```
+
+Also you may want to customize the logging behavior:
+
+```js
+debug(controller, {
   stateChange(value) {
-    console.log(value);
+    myCustomLogFunction(value);
   },
 });
 ```
 
-By default, [debug] will be verbose logging every state change, but you can mute
-it without having to configure all the options:
+The debug function returns the controller that you pass to it:
 
 ```js
-import { debug } from 'rinter';
-
-const controller = debug(initialController, debug.SILENT);
+const controller = debug(createController());
 ```
 
-### Multiple subscribers
-
-Both `DefaultController` and `CompositeController` are going to generate an
-error if you try to subscribe to `changes` multiple times without unsubscribing:
+If you pass a controller factory function, debug will detect it and return a
+factory function too:
 
 ```js
-const subscription = controller.changes.subscribe(v => {
-  /*... */
+const createController = debug(initialCreateController);
+const controller = createController();
+```
+
+Which is handy when using [compose]:
+
+```js
+const twoCounters = compose({
+  a: debug(counter),
+  b: counter,
 });
-
-// The observable is going to generate an error.
-// Note that per RxJS design subscribe doesn't throw an exception,
-// it emits an error event.
-const otherSubscription = controller.changes.subscribe(
-  v => {
-    /*... */
-  },
-  () => {
-    /* error! you must call subscription.unsubscribe() first */
-  }
-);
 ```
 
-That behavior is by design. On a front-end app, you usually have only one
-subscriber: the view. If you need to broadcast changes use the [share] function:
-
-```js
-import { share } from 'rinter';
-
-const sharedController = share(controller);
-
-// now you can subscribe to sharedController.changes multiple times
-```
-
-### Big bundle size
+### Bundle Size
 
 Rinter itself is small, but [RxJS] is a big module. If your bundle size is big,
 make sure to use a bundler that supports ES6 modules and does [tree-shaking] to
@@ -189,7 +193,6 @@ MIT
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking/
 [webpack]: https://webpack.js.org
 [rollup]: https://rollupjs.org/
-
 [controller]: ./docs/reference/functions/controller.md
 [controller interface]: ./docs/reference/interface/controller.md
 [compose]: ./docs/reference/functions/compose.md

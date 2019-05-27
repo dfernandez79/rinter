@@ -53,20 +53,6 @@ test('set changes the state', () => {
   });
 });
 
-test('supports only one subscription', () => {
-  const counter = new Counter();
-  const changesCallback = jest.fn();
-  const errorCallback = jest.fn();
-
-  counter.changes.subscribe(state => expect(state).toBe(1));
-  counter.changes.subscribe(changesCallback, errorCallback);
-
-  counter.increment();
-
-  expect(changesCallback).not.toHaveBeenCalled();
-  expect(errorCallback).toHaveBeenCalled();
-});
-
 test('updates without subscription do not throw', () => {
   const counter = new Counter();
 
@@ -86,4 +72,15 @@ test('Remove subscription', () => {
   subscription.unsubscribe();
   counter.increment();
   expect(changesCallback).not.toHaveBeenCalled();
+});
+
+test('convert a controller changes to a shared observable', () => {
+  expect.assertions(2);
+
+  const counter = new Counter();
+
+  counter.changes.subscribe(state => expect(state).toBe(1));
+  counter.changes.subscribe(state => expect(state).toBe(1));
+
+  counter.increment();
 });

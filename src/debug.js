@@ -1,5 +1,3 @@
-import share from './share';
-
 const SILENT = {
   stateChange() {},
 };
@@ -15,10 +13,12 @@ const VERBOSE = {
 function debug(controller, options = VERBOSE) {
   const opts = Object.assign({}, SILENT, options);
 
-  const newController = share(controller);
-  newController.changes.subscribe(opts.stateChange);
-
-  return newController;
+  if (typeof controller === 'function') {
+    return (...args) => debug(controller(...args), opts);
+  } else {
+    controller.changes.subscribe(opts.stateChange);
+    return controller;
+  }
 }
 
 debug.SILENT = SILENT;

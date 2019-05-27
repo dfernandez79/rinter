@@ -61,7 +61,8 @@ alternative ways of creating a controller:
   - 👎 Not good:
     - You cannot use sub-classing to refactor code.
     - You cannot use future JavaScript class features without re-writing.
-    - You need to be consistent about bound methods.
+    - Mixing controllers created with this function and `DefaultController` may
+      generate some confusion regarding bound methods.
 - Sub-class [DefaultController]:
   - 👍 Good
     - Uses ES6 syntax which may play better with tooling, e.g IDE's type
